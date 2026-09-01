@@ -1,0 +1,12 @@
+{
+  "name": "Jeanne Randu — Portfolio",
+  "short_name": "Jeanne Randu",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ece7dd",
+  "theme_color": "#ece7dd",
+  "icons": [
+    { "src": "./favicon-32x32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "./apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
