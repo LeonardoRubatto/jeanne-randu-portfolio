@@ -14,6 +14,7 @@
   const projectPanels = Array.from(document.querySelectorAll(".project-panel"));
   const photoCards = Array.from(document.querySelectorAll(".photo-card"));
   const photoStack = document.querySelector(".photo-stack");
+  const verandaPanel = document.querySelector(".project-panel--veranda");
   let scrollFrame = 0;
   // Set by initLightbox() below; called by initDepthGallery() to open the
   // same lightbox on a mobile archive-card tap (see there for why).
@@ -189,12 +190,15 @@
   });
 
   // Mobile véranda: same idea as desktop's scroll-linked photo reveal
-  // above, just driven by the stack's own position in the viewport
-  // instead of the pinned section's shared progress (mobile panels
-  // aren't pinned — they're normal document flow). Without this, every
-  // photo used to arrive together as a static pile the moment the stack
-  // scrolled into view.
-  if (photoStack) {
+  // above, driven off the panel's own progress through the viewport —
+  // .project-panel--veranda is a tall scroll "driver" (styles.css), with
+  // .panel-sticky inside it pinned via position: sticky, so the section
+  // visually holds still while this scroll math plays the photos out; the
+  // rect read here MUST be the outer driver, not .photo-stack itself —
+  // .photo-stack is inside the pinned frame, so once pinning engages its
+  // own rect stops changing (it's visually frozen), which would freeze
+  // this progress calculation too.
+  if (photoStack && verandaPanel) {
     if (reducedMotion.matches) {
       photoCards.forEach((card) => placePhotoCard(card, 1));
     } else {
@@ -203,10 +207,10 @@
       function updateMobilePhotoStack() {
         mobileStackFrame = 0;
         if (desktop.matches) return;
-        const rect = photoStack.getBoundingClientRect();
+        const rect = verandaPanel.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
-        const total = Math.max(1, viewportHeight + rect.height);
-        const progress = clamp((viewportHeight - rect.top) / total);
+        const total = Math.max(1, rect.height - viewportHeight);
+        const progress = clamp(-rect.top / total);
         const period = 1 / Math.max(1, photoCards.length);
         photoCards.forEach((card, index) => {
           const start = index * period;
@@ -227,12 +231,13 @@
     }
   }
 
-  // Mobile stage crossfade: same panels as STAGE_WINDOWS_DESKTOP above,
-  // but driven by each panel's own position in the viewport (mobile
-  // panels are normal flow, not pinned) rather than the shared pinned-
-  // scroll progress — same technique as the mobile véranda stack above.
-  // The crossfade happens in the latter part of the panel's scroll-
-  // through, once its own content/media has had room to be seen.
+  // Mobile stage crossfade: same panels as STAGE_WINDOWS_DESKTOP above.
+  // Each panel is a tall scroll driver with a position: sticky frame
+  // pinned inside it (see .panel-sticky in styles.css) — raw here is
+  // "how far through that pinned dwell", 0 at the moment it engages, 1
+  // as it's about to release into the next panel, same formula as the
+  // véranda mobile progress above (must read the driver's own rect, not
+  // a descendant — a descendant's rect stops changing once pinned).
   if (stagePanels.length) {
     if (reducedMotion.matches) {
       stagePanels.forEach((panel) => applyStageProgress(panel, 0));
@@ -251,8 +256,8 @@
         stagePanels.forEach((panel) => {
           const rect = panel.getBoundingClientRect();
           const viewportHeight = window.innerHeight;
-          const total = Math.max(1, viewportHeight + rect.height);
-          const raw = clamp((viewportHeight - rect.top) / total);
+          const total = Math.max(1, rect.height - viewportHeight);
+          const raw = clamp(-rect.top / total);
           const w = STAGE_WINDOWS_MOBILE[panel.dataset.stagePanel] || STAGE_WINDOW_MOBILE_DEFAULT;
           applyStageProgress(panel, range(raw, w[0], w[1]));
         });
@@ -482,12 +487,29 @@
       // The active card is only ~35vw wide, centered, in a full-width
       // gallery — there's real room either side of it on desktop. Angle 0
       // starts pointing right (not up), so two images land left/right of
-      // the image instead of directly above/below it (dead center
-      // horizontally, i.e. on top of it — which is what was happening).
-      const radiusX = 44;
-      const radiusY = 20;
+      // the image instead of directly above/below it. Positions are
+      // computed in real pixels off the gallery's own measured box (not
+      // fixed percentages) and clamped to it, so the images never run
+      // off the edge — .depth-gallery clips overflow, so anything placed
+      // outside its bounds was getting cut off rather than just spilling
+      // past the section.
+      const IMG_W = 148;
+      const IMG_H = 192;
+      const MARGIN = 12;
+      const galleryRect = gallery.getBoundingClientRect();
+      const centerX = galleryRect.width / 2;
+      const centerY = galleryRect.height * 0.46;
+      const radiusX = Math.min(galleryRect.width * 0.42, centerX - IMG_W / 2 - MARGIN);
+      const radiusY = Math.min(galleryRect.height * 0.2, centerY - IMG_H / 2 - MARGIN);
+      const minX = IMG_W / 2 + MARGIN;
+      const maxX = galleryRect.width - IMG_W / 2 - MARGIN;
+      const minY = IMG_H / 2 + MARGIN;
+      const maxY = galleryRect.height - IMG_H / 2 - MARGIN;
+
       images.forEach((src, index) => {
         const angle = (index / images.length) * Math.PI * 2;
+        const x = clamp(centerX + Math.cos(angle) * radiusX, minX, maxX);
+        const y = clamp(centerY + Math.sin(angle) * radiusY, minY, maxY);
         const img = document.createElement("img");
         img.src = src;
         img.alt = `Autre vue du projet ${project.title || ""}`.trim();
@@ -496,8 +518,9 @@
         img.tabIndex = 0;
         img.setAttribute("role", "button");
         img.setAttribute("aria-label", `Agrandir : ${img.alt}`);
-        img.style.left = `${50 + Math.cos(angle) * radiusX}%`;
-        img.style.top = `${46 + Math.sin(angle) * radiusY}%`;
+        img.style.left = `${x}px`;
+        img.style.top = `${y}px`;
+        img.style.animationDelay = `${index * -1.3}s`;
         img.style.transitionDelay = `${index * 60}ms`;
         // Same close-up lightbox every other photo on the site uses.
         img.addEventListener("click", (event) => {

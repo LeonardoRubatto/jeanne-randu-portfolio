@@ -1,6 +1,5 @@
-import { sites } from "@openai/sites-vite-plugin";
 import { defineConfig } from "vite";
-import { copyFile, cp, mkdir, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 
 function copyStaticRuntime() {
@@ -8,7 +7,6 @@ function copyStaticRuntime() {
     name: "copy-static-runtime",
     async closeBundle() {
       await mkdir(resolve("dist"), { recursive: true });
-      await mkdir(resolve("dist", "server"), { recursive: true });
       await mkdir(resolve("dist", "data"), { recursive: true });
       await Promise.all(
         [
@@ -32,18 +30,13 @@ function copyStaticRuntime() {
       // always resolve, alongside Vite's separate hashed copies for the
       // images referenced directly in the HTML source.
       await cp(resolve("assets"), resolve("dist", "assets"), { recursive: true });
-      await writeFile(
-        resolve("dist", "server", "index.js"),
-        'export default { fetch(request, env) { return env.ASSETS.fetch(request); } };\n',
-        "utf8",
-      );
     },
   };
 }
 
 export default defineConfig({
   base: "./",
-  plugins: [sites(), copyStaticRuntime()],
+  plugins: [copyStaticRuntime()],
   build: {
     outDir: "dist",
     emptyOutDir: true,

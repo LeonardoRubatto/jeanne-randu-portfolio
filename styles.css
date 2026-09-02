@@ -1188,6 +1188,11 @@ button {
   pointer-events: none;
 }
 
+@keyframes depth-related-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -14px; }
+}
+
 .depth-related img {
   position: absolute;
   z-index: 1;
@@ -1201,6 +1206,9 @@ button {
   cursor: pointer;
   transform: translate(-50%, -50%) scale(0.7);
   transition: opacity 400ms var(--ease), transform 400ms var(--ease), z-index 0s;
+  /* Gentle drift once settled — translate is its own property, separate
+     from the transform above (centering/scale), so they don't fight. */
+  animation: depth-related-float 6.4s ease-in-out infinite;
 }
 
 .depth-related img:hover,
@@ -1372,10 +1380,11 @@ button {
 .footer-contact {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 32px;
+  gap: 14px 40px;
   margin: 0 0 56px;
-  font-size: 14px;
-  letter-spacing: 0.02em;
+  font-size: 20px;
+  font-variation-settings: "wght" 520;
+  letter-spacing: 0.01em;
 }
 
 .footer-contact a {
@@ -1678,18 +1687,42 @@ body.lightbox-lock {
     overflow: visible;
   }
 
+  /* Each panel is a tall scroll "driver" in normal flow; .panel-sticky
+     inside it is the actual 100svh viewport-height frame, pinned via
+     position: sticky while the driver's extra height scrolls underneath
+     it. That's what makes the section visually hold still — background,
+     title, everything — while script.js's per-panel scroll math (same
+     rect-based technique either way) drives the photo/stage changes
+     within that pinned frame; only once the driver's height is used up
+     does the frame release and the next section begins. Panel min-height
+     is how long each one stays pinned — see the per-panel overrides
+     below for the actual values. */
   .project-panel,
   .project-panel:nth-child(n) {
     position: relative;
     inset: auto;
     min-height: 112svh;
     clip-path: none;
+    /* Base rule (desktop) sets overflow: hidden — on a sticky-pinned
+       child, an overflow:hidden ancestor breaks the sticky behavior
+       (it can't hold beyond that ancestor's clipped box). The clipping
+       job moves to .panel-sticky itself below. */
+    overflow: visible;
+  }
+
+  .panel-sticky {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100svh;
+    overflow: hidden;
     opacity: 0;
     transform: translateY(28px);
     transition: opacity 700ms var(--ease), transform 700ms var(--ease);
   }
 
-  .project-panel.is-revealed {
+  .project-panel.is-revealed .panel-sticky {
     opacity: 1;
     transform: translateY(0);
   }
@@ -1723,7 +1756,12 @@ body.lightbox-lock {
      down (was top:47%) — the description paragraph is long enough that
      it was running into the board's top edge; this gives it clear room
      regardless of exactly how many lines it wraps to on a given phone. */
-  .project-panel--cabane { min-height: 176svh; }
+  /* Written as .project-panel.project-panel--X (not just .project-panel--X)
+     to match — .project-panel:nth-child(n) above has higher specificity
+     ((0,2,0), a class + a pseudo-class) than a single class selector, so
+     it was silently winning over every one of these min-height overrides
+     the whole time regardless of what value was set here. */
+  .project-panel.project-panel--cabane { min-height: 220svh; }
 
   .cabane-backdrop::after {
     background: linear-gradient(180deg, rgba(10, 13, 9, 0.92) 0%, rgba(10, 13, 9, 0.45) 48%, rgba(10, 13, 9, 0.78) 100%);
@@ -1744,7 +1782,7 @@ body.lightbox-lock {
 
   /* Same reasoning as cabane above — more height, media pushed down, so
      the description text has clear room above it. */
-  .project-panel--nike { min-height: 150svh; }
+  .project-panel.project-panel--nike { min-height: 190svh; }
 
   .nike-canvas-wrap {
     top: 52%;
@@ -1764,7 +1802,7 @@ body.lightbox-lock {
      through the viewport, so giving it 3x+ the room is what makes each
      photo linger — a taller min-height, not a tweak to the JS formula
      (which would just mean the last photos never fully arrive). */
-  .project-panel--veranda { min-height: 400svh; }
+  .project-panel.project-panel--veranda { min-height: 480svh; }
 
   /* Sticky, not absolute: the title/intro stay in view for as long as
      the (very tall) panel is being scrolled through, i.e. until the
@@ -1796,7 +1834,7 @@ body.lightbox-lock {
   .veranda-notation { display: none; }
 
   /* Same reasoning as cabane/nike above. */
-  .project-panel--cave { min-height: 140svh; }
+  .project-panel.project-panel--cave { min-height: 180svh; }
   .cave-gallery { inset: 52% 0 0 0; }
 
   .cave-gallery::after {
