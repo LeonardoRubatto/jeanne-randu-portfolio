@@ -21,10 +21,44 @@
     ));
   }
 
+  // --- Responsive image sources (rules/images.md: AVIF + WebP, 640/960/
+  // 1536 widths, never upscaled — see scripts/optimize-images.mjs, which
+  // generates the files this reads from data/image-variants.js). ---
+  const imageVariants = window.SITE_IMAGE_VARIANTS || {};
+
+  function buildSrcset(basePath, format) {
+    const widths = imageVariants[basePath];
+    if (!widths || !widths.length) return "";
+    const withoutExt = basePath.replace(/\.\w+$/, "");
+    return widths.map((w) => `${withoutExt}-${w}.${format} ${w}w`).join(", ");
+  }
+
+  function pictureSourcesMarkup(basePath, sizes) {
+    const avif = buildSrcset(basePath, "avif");
+    const webp = buildSrcset(basePath, "webp");
+    const sizesAttr = esc(sizes);
+    return `${avif ? `<source type="image/avif" srcset="${esc(avif)}" sizes="${sizesAttr}">` : ""}${webp ? `<source type="image/webp" srcset="${esc(webp)}" sizes="${sizesAttr}">` : ""}`;
+  }
+
+  // Applies to an existing <img> that already sits inside a <picture> in
+  // the HTML (used for data-field/data-media-driven images, whose <img>
+  // src changes at runtime — see below).
+  function applyPictureSources(imgEl, basePath) {
+    const picture = imgEl.closest("picture");
+    if (!picture) return;
+    const avifSource = picture.querySelector('source[type="image/avif"]');
+    const webpSource = picture.querySelector('source[type="image/webp"]');
+    const avifSrcset = buildSrcset(basePath, "avif");
+    const webpSrcset = buildSrcset(basePath, "webp");
+    if (avifSource) avifSource.srcset = avifSrcset;
+    if (webpSource) webpSource.srcset = webpSrcset;
+  }
+
   // --- Archive tier: full generation ---
   function archiveCard(project, index) {
+    const sizes = "(min-width: 900px) 30vw, 78vw";
     return `<button class="depth-card" type="button" data-index="${index}" data-slug="${esc(project.slug)}" data-number="${esc(project.number)}" data-title="${esc(project.title)}" data-type="${esc(project.type)}" data-position="0" aria-pressed="${index === 0 ? "true" : "false"}">
-      <figure><img src="${esc(project.image)}" alt="${esc(project.alt)}" width="1000" height="1200" loading="lazy"><figcaption class="media-caption"><span>${esc(project.number)}</span><strong>${esc(project.title)}</strong></figcaption></figure>
+      <figure><picture>${pictureSourcesMarkup(project.image, sizes)}<img src="${esc(project.image)}" alt="${esc(project.alt)}" width="1000" height="1200" loading="lazy" decoding="async"></picture><figcaption class="media-caption"><span>${esc(project.number)}</span><strong>${esc(project.title)}</strong></figcaption></figure>
     </button>`;
   }
 
@@ -47,6 +81,7 @@
     const target = el.dataset.fieldTarget;
     if (target) {
       el.setAttribute(target, value);
+      if (target === "src" && el.tagName === "IMG") applyPictureSources(el, value);
     } else {
       el.textContent = value;
     }
@@ -65,6 +100,7 @@
     if (el.tagName === "IMG") {
       el.src = media.image;
       el.alt = media.alt;
+      applyPictureSources(el, media.image);
       return;
     }
     const target = el.dataset.mediaTarget;

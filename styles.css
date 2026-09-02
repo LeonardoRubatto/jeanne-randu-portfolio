@@ -57,6 +57,14 @@
   box-sizing: border-box;
 }
 
+/* <picture> wrappers (AVIF/WebP responsive sources — see render.js and
+   scripts/optimize-images.mjs) stay layout-invisible, so every existing
+   `... img { height: 100%; object-fit: ...; }` rule across the site keeps
+   sizing the selected <img> exactly as it did as a bare element. */
+picture {
+  display: contents;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -242,6 +250,16 @@ button {
   font-size: 24px;
   font-weight: 400;
   line-height: 1.12;
+}
+
+/* Mobile only (see media query below): a duplicate of the discipline
+   heading, clipped to exactly the hero photo's footprint and colored
+   white, sitting on top of the real (dark) one — so wherever the text
+   crosses onto the image it reads white, and everywhere else the
+   original dark text underneath still shows through. Same technique as
+   .prologue-contrast-mask below, just for this element specifically. */
+.prologue-discipline-mask {
+  display: none;
 }
 
 .prologue-image-primary {
@@ -608,6 +626,7 @@ button {
   gap: 12px;
   align-items: baseline;
   padding: 16px;
+  background: rgba(14, 15, 12, 0.78);
   color: #fff;
   opacity: 0;
   transform: translateY(100%);
@@ -615,29 +634,9 @@ button {
   pointer-events: none;
 }
 
-/* A graduated blur under the caption text — only the bottom of the image
-   softens, fading to fully sharp above — instead of a single flat blur
-   value snapping in as a hard-edged bar. One masked backdrop-filter layer
-   (design system: backgrounds/edge-blur's BottomBlur) rather than the
-   full 5-layer stack, which is overkill for a caption scrim this small. */
-.media-caption::before {
-  position: absolute;
-  z-index: -1;
-  inset: -56px 0 0;
-  content: "";
-  backdrop-filter: blur(20px) saturate(0.82);
-  -webkit-backdrop-filter: blur(20px) saturate(0.82);
-  background: linear-gradient(to top, rgba(14, 15, 12, 0.55) 0%, rgba(14, 15, 12, 0.22) 45%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 30%, transparent 100%);
-  mask-image: linear-gradient(to top, #000 0%, #000 30%, transparent 100%);
-}
-
 .media-caption--dark {
+  background: rgba(245, 241, 233, 0.85);
   color: var(--ink);
-}
-
-.media-caption--dark::before {
-  background: linear-gradient(to top, rgba(245, 241, 233, 0.72) 0%, rgba(245, 241, 233, 0.32) 45%, transparent 100%);
 }
 
 .media-caption span {
@@ -653,11 +652,20 @@ button {
 }
 
 .project-media:hover .media-caption,
-.project-media:focus-within .media-caption,
 .depth-card:hover .media-caption,
 .depth-card:focus-visible .media-caption {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Caption reveal is :hover-only, not :focus-within — a lightbox close
+   returns focus to whichever photo opened it (real accessibility, not
+   optional), and tying the caption to focus meant that photo's caption
+   stayed stuck open afterward. Keyboard users still get a visible focus
+   ring here instead. */
+.project-media:focus-visible {
+  outline: 2px solid var(--paper-light);
+  outline-offset: -2px;
 }
 
 /* Cabane: the drawings sit on opaque paper plates instead of blending into the forest. */
@@ -751,14 +759,6 @@ button {
 .project-panel--nike {
   background: #0d0e0c;
   color: var(--paper-light);
-}
-
-.nike-grid {
-  position: absolute;
-  inset: 0;
-  opacity: 0.18;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
-  background-size: 32px 32px;
 }
 
 .nike-canvas-wrap {
@@ -871,6 +871,17 @@ button {
   opacity: 0;
   transform: translate(-50%, 20%) rotate(0deg) scale(0.94);
   will-change: transform, opacity;
+}
+
+/* The fanned photos overlap almost entirely (near-identical data-x/data-y
+   with only rotation setting them apart), so a middle card in DOM order
+   can end up with only a thin rotated-corner sliver actually exposed —
+   bring whichever one the cursor is currently over (or has keyboard
+   focus) to the front so every photo, not just the first/last in DOM
+   order, is reachable and its full caption/hover state is visible. */
+.photo-card:hover,
+.photo-card:focus-visible {
+  z-index: 10;
 }
 
 .photo-card img {
@@ -1015,6 +1026,8 @@ button {
 .depth-card {
   --float-x: 0px;
   --float-y: 0px;
+  --idle-x: 0px;
+  --idle-y: 0px;
   position: absolute;
   z-index: 1;
   padding: 0;
@@ -1022,7 +1035,7 @@ button {
   background: transparent;
   cursor: pointer;
   opacity: 0.54;
-  translate: var(--float-x) var(--float-y);
+  translate: calc(var(--float-x) + var(--idle-x)) calc(var(--float-y) + var(--idle-y));
   transition: top 600ms var(--ease), right 600ms var(--ease), bottom 600ms var(--ease), left 600ms var(--ease), width 600ms var(--ease), height 600ms var(--ease), opacity 400ms var(--ease), filter 400ms var(--ease), transform 600ms var(--ease), translate 250ms var(--ease);
 }
 
@@ -1540,6 +1553,24 @@ body.lightbox-lock {
     font-size: 20px;
   }
 
+  /* Same rect as .prologue-image-primary/.prologue-image-layer below
+     (top:20%, width:88% from the right edge i.e. left:12%, height:57%)
+     so the white duplicate is clipped to exactly where the photo sits. */
+  .prologue-discipline-mask {
+    display: block;
+    position: absolute;
+    z-index: 5;
+    inset: 0;
+    overflow: hidden;
+    clip-path: inset(20% 0 23% 12%);
+    pointer-events: none;
+  }
+
+  .prologue-discipline--contrast {
+    margin: 0;
+    color: var(--paper-light);
+  }
+
   .prologue-image-primary,
   .prologue-image-layer {
     top: 20%;
@@ -1607,6 +1638,14 @@ body.lightbox-lock {
     inset: auto;
     min-height: 112svh;
     clip-path: none;
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 700ms var(--ease), transform 700ms var(--ease);
+  }
+
+  .project-panel.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .panel-copy {
@@ -1634,18 +1673,22 @@ body.lightbox-lock {
 
   .panel-foot span:nth-child(3) { display: none; }
 
-  .project-panel--cabane { min-height: 142svh; }
+  /* Taller than before (was 142svh) with the media board pushed further
+     down (was top:47%) — the description paragraph is long enough that
+     it was running into the board's top edge; this gives it clear room
+     regardless of exactly how many lines it wraps to on a given phone. */
+  .project-panel--cabane { min-height: 176svh; }
 
   .cabane-backdrop::after {
     background: linear-gradient(180deg, rgba(10, 13, 9, 0.92) 0%, rgba(10, 13, 9, 0.45) 48%, rgba(10, 13, 9, 0.78) 100%);
   }
 
   .cabane-media-board {
-    top: 47%;
+    top: 60%;
     right: 16px;
     left: 16px;
     width: auto;
-    height: 44%;
+    height: 37%;
   }
 
   .cabane-media--exterior { width: 58%; height: 54%; }
@@ -1653,12 +1696,14 @@ body.lightbox-lock {
   .cabane-media--bedroom { width: 42%; height: 38%; }
   .cabane-media--plan { width: 40%; height: 34%; }
 
-  .project-panel--nike { min-height: 120svh; }
+  /* Same reasoning as cabane above — more height, media pushed down, so
+     the description text has clear room above it. */
+  .project-panel--nike { min-height: 150svh; }
 
   .nike-canvas-wrap {
-    top: 40%;
+    top: 52%;
     width: 100%;
-    height: 52%;
+    height: 45%;
   }
 
   .nike-canvas-wrap::after {
@@ -1668,14 +1713,31 @@ body.lightbox-lock {
   .nike-poster { right: 6%; bottom: 7%; width: 32%; }
   .nike-lines { top: 32%; width: 90%; }
 
-  .project-panel--veranda { min-height: 124svh; }
-  .panel-copy--veranda { top: 64px; }
+  /* Tall on purpose: the photo-stack's scroll-driven reveal (script.js)
+     computes its progress from how far this panel has actually scrolled
+     through the viewport, so giving it 3x+ the room is what makes each
+     photo linger — a taller min-height, not a tweak to the JS formula
+     (which would just mean the last photos never fully arrive). */
+  .project-panel--veranda { min-height: 400svh; }
+
+  /* Sticky, not absolute: the title/intro stay in view for as long as
+     the (very tall) panel is being scrolled through, i.e. until the
+     photo sequence below has fully played out — then it releases
+     naturally once the panel itself scrolls past, moving on to cave. */
+  .panel-copy--veranda {
+    position: sticky;
+    top: 64px;
+  }
 
   .photo-stack {
-    top: 48%;
+    top: 14%;
     right: 0;
     width: 100%;
-    height: 44%;
+    /* Ends well short of the panel's own bottom edge (66% + 14% top =
+       80%) so there's a real settled hold after the last photo arrives —
+       the véranda background stays in view until then — before scrolling
+       far enough to actually leave the panel for cave. */
+    height: 66%;
   }
 
   .photo-card {
@@ -1685,24 +1747,23 @@ body.lightbox-lock {
     transition: opacity 600ms var(--ease), transform 700ms var(--ease);
   }
 
-  .photo-stack.is-arrived .photo-card:nth-child(1) { transition-delay: 0ms; }
-  .photo-stack.is-arrived .photo-card:nth-child(2) { transition-delay: 70ms; }
-  .photo-stack.is-arrived .photo-card:nth-child(3) { transition-delay: 140ms; }
-  .photo-stack.is-arrived .photo-card:nth-child(4) { transition-delay: 210ms; }
-  .photo-stack.is-arrived .photo-card:nth-child(5) { transition-delay: 280ms; }
-
   .veranda-notation { display: none; }
 
-  .project-panel--cave { min-height: 112svh; }
-  .cave-gallery { inset: 42% 0 0 0; }
+  /* Same reasoning as cabane/nike above. */
+  .project-panel--cave { min-height: 140svh; }
+  .cave-gallery { inset: 52% 0 0 0; }
 
   .cave-gallery::after {
     background: linear-gradient(180deg, #2b201d 0%, transparent 24%);
   }
 
   .cave-image--main { width: 100%; height: 100%; }
-  .cave-image--detail { right: 4%; width: 44%; height: 34%; }
-  .cave-image--plan { left: 4%; width: 32%; height: 28%; }
+
+  /* Desktop pins these to bottom:8%, which on the mobile gallery box left
+     the whole middle empty and both overlays crowding the very bottom.
+     Spread them through the middle of the gallery region instead. */
+  .cave-image--detail { top: 24%; right: 4%; bottom: auto; width: 44%; height: 34%; }
+  .cave-image--plan { top: 48%; left: 4%; bottom: auto; width: 32%; height: 28%; }
 
   .archive { padding: 96px 16px 72px; }
 
@@ -1714,64 +1775,47 @@ body.lightbox-lock {
 
   .archive-intro p { width: 100%; }
 
+  /* No coverflow on mobile — a vertical zigzag list instead, each card a
+     plain single-tap close-up (script.js branches the click handler on
+     !desktop.matches). The [data-position] rules above still apply on
+     desktop only; here every card resets to static, normal-flow, full
+     opacity regardless of its data-position value (same specificity,
+     later in the cascade wins — see initDepthGallery's comment). */
   .depth-gallery {
-    height: 760px;
+    display: flex;
+    flex-direction: column;
+    height: auto;
     min-height: 0;
     overflow: visible;
+    gap: 40px;
+    padding: 8px 0 32px;
   }
 
-  .depth-gallery::before {
-    width: 92vw;
-    height: 92vw;
+  .depth-gallery::before { display: none; }
+
+  .depth-card[data-position] {
+    position: static;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: auto;
+    width: 74vw;
+    max-width: 420px;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    opacity: 1;
+    transform: none;
   }
 
-  .depth-card[data-position="0"] {
-    top: 6%;
-    width: min(72vw, 420px);
-    height: 54%;
-  }
+  .depth-card:nth-child(odd) { align-self: flex-start; rotate: -2deg; }
+  .depth-card:nth-child(even) { align-self: flex-end; rotate: 2deg; }
+  .depth-card:nth-child(3n) { align-self: center; rotate: -1deg; }
 
-  .depth-card[data-position="-1"] {
-    top: 12%;
-    left: -5%;
-    width: 30vw;
-    height: 26%;
+  .depth-gallery-label,
+  .depth-gallery-hint {
+    display: none;
   }
-
-  .depth-card[data-position="1"] {
-    top: 14%;
-    left: 75%;
-    width: 30vw;
-    height: 26%;
-  }
-
-  .depth-card[data-position="-2"] {
-    top: 57%;
-    left: 3%;
-    width: 27vw;
-    height: 23%;
-  }
-
-  .depth-card[data-position="2"] {
-    top: 58%;
-    left: 70%;
-    width: 27vw;
-    height: 23%;
-  }
-
-  .depth-card[data-position="-3"] {
-    top: 64%;
-    left: -8%;
-    width: 24vw;
-    height: 20%;
-  }
-
-  .depth-gallery-label {
-    bottom: 5%;
-    width: 80vw;
-  }
-
-  .depth-gallery-hint { display: none; }
 
   .about { padding: 96px 16px 72px; }
   .about-title { padding: 72px 0; }
@@ -1815,9 +1859,12 @@ body.lightbox-lock {
 }
 
 @media (hover: none) {
+  /* No hover on touch — rather than force the caption permanently on
+     (which meant a permanent dark bar over every photo), drop it
+     entirely. The same number/label still shows in the lightbox once a
+     photo is tapped open. */
   .media-caption {
-    opacity: 1;
-    transform: translateY(0);
+    display: none;
   }
 }
 

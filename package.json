@@ -11,10 +11,12 @@
     "build": "vite build",
     "start": "vite preview --host 0.0.0.0",
     "sync": "node scripts/sync-content.mjs",
-    "check": "node --check script.js && node --check render.js && node --check scripts/sync-content.mjs"
+    "optimize-images": "node scripts/optimize-images.mjs",
+    "check": "node --check script.js && node --check render.js && node --check scripts/sync-content.mjs && node --check scripts/optimize-images.mjs"
   },
   "devDependencies": {
     "@openai/sites-vite-plugin": "0.2.0",
+    "sharp": "^0.35.4",
     "vite": "8.0.13"
   }
 }

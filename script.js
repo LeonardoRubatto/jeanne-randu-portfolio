@@ -15,12 +15,15 @@
   const photoCards = Array.from(document.querySelectorAll(".photo-card"));
   const photoStack = document.querySelector(".photo-stack");
   let scrollFrame = 0;
+  // Set by initLightbox() below; called by initDepthGallery() to open the
+  // same lightbox on a mobile archive-card tap (see there for why).
+  let openLightboxWith = null;
 
-  // Same overall scroll-progress envelope as before (0.49-0.77) — only how
-  // it's divided among the cards changes, so this doesn't touch the cave
-  // panel's own reveal timing below.
+  // Widened further (0.49-0.84, was 0.49-0.77) so each photo needs
+  // noticeably more scrolling before the next one arrives. Cave's own
+  // reveal window below is pushed out to start at the same 0.84 to match.
   const PHOTO_ARRIVAL_START = 0.49;
-  const PHOTO_ARRIVAL_END = 0.77;
+  const PHOTO_ARRIVAL_END = 0.84;
 
   function placePhotoCard(card, progress) {
     const x = Number(card.dataset.x || -50);
@@ -42,7 +45,7 @@
   const REVEAL_WINDOWS_DEFAULT = [
     [0.16, 0.31],
     [0.37, 0.52],
-    [0.77, 0.91],
+    [0.84, 0.91],
   ];
 
   function revealWindowsFor(count) {
@@ -130,23 +133,75 @@
     });
   });
 
-  if (photoStack && (!desktop.matches || reducedMotion.matches)) {
+  // Mobile véranda: same idea as desktop's scroll-linked photo reveal
+  // above, just driven by the stack's own position in the viewport
+  // instead of the pinned section's shared progress (mobile panels
+  // aren't pinned — they're normal document flow). Without this, every
+  // photo used to arrive together as a static pile the moment the stack
+  // scrolled into view.
+  if (photoStack) {
     if (reducedMotion.matches) {
       photoCards.forEach((card) => placePhotoCard(card, 1));
     } else {
-      const stackObserver = new IntersectionObserver(
-        (entries, observer) => {
-          if (!entries[0].isIntersecting) return;
-          photoStack.classList.add("is-arrived");
-          photoCards.forEach((card, index) => {
-            window.setTimeout(() => placePhotoCard(card, 1), index * 70);
-          });
-          observer.disconnect();
-        },
-        { rootMargin: "0px 0px -18% 0px", threshold: 0.12 },
-      );
-      stackObserver.observe(photoStack);
+      let mobileStackFrame = 0;
+
+      function updateMobilePhotoStack() {
+        mobileStackFrame = 0;
+        if (desktop.matches) return;
+        const rect = photoStack.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const total = Math.max(1, viewportHeight + rect.height);
+        const progress = clamp((viewportHeight - rect.top) / total);
+        const period = 1 / Math.max(1, photoCards.length);
+        photoCards.forEach((card, index) => {
+          const start = index * period;
+          const arrival = range(progress, start, start + period * 0.6);
+          placePhotoCard(card, arrival);
+        });
+      }
+
+      function requestMobilePhotoUpdate() {
+        if (mobileStackFrame) return;
+        mobileStackFrame = window.requestAnimationFrame(updateMobilePhotoStack);
+      }
+
+      window.addEventListener("scroll", requestMobilePhotoUpdate, { passive: true });
+      window.addEventListener("resize", requestMobilePhotoUpdate, { passive: true });
+      desktop.addEventListener?.("change", requestMobilePhotoUpdate);
+      requestMobilePhotoUpdate();
     }
+  }
+
+  // Mobile: a small fade/rise-in as each big-project section first
+  // scrolls into view — panels here are plain stacked flow (no pinning),
+  // so without this they just appear instantly with no transition at all.
+  if (!reducedMotion.matches) {
+    const panelObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 },
+    );
+
+    function syncPanelReveal() {
+      projectPanels.forEach((panel) => {
+        if (desktop.matches) {
+          panel.classList.add("is-revealed");
+          panelObserver.unobserve(panel);
+        } else {
+          panelObserver.observe(panel);
+        }
+      });
+    }
+
+    syncPanelReveal();
+    desktop.addEventListener?.("change", syncPanelReveal);
+  } else {
+    projectPanels.forEach((panel) => panel.classList.add("is-revealed"));
   }
 
   function initReverseMosaic(canvas) {
@@ -211,27 +266,36 @@
         for (let x = 0; x < width; x += tile) {
           const distance = Math.hypot(x + tile / 2 - localPointerX, y + tile / 2 - localPointerY);
           const influence = clamp(1 - distance / radius);
-          // scale reaches exactly 1 (fully solid, no gap) once a tile is
-          // outside the hover radius — the mosaic only dissolves right
-          // around the cursor, not as a faint grid over the whole image.
-          const scale = 0.1 + (1 - influence) * 0.9;
-          const size = Math.max(1, (tile - 1.5 * dpr) * scale);
           const sx = sourceX + (x / width) * sourceWidth;
           const sy = sourceY + (y / height) * sourceHeight;
           const sw = (tile / width) * sourceWidth;
           const sh = (tile / height) * sourceHeight;
 
-          context.drawImage(
-            image,
-            sx,
-            sy,
-            sw,
-            sh,
-            x + (tile - size) / 2,
-            y + (tile - size) / 2,
-            size,
-            size,
-          );
+          // The reference effect (design system: image-treatment/
+          // canvas-grid-mouse-effect) draws every tile at its full,
+          // unchanging destination size — the DESTINATION never shrinks,
+          // so nothing behind the canvas is ever revealed. What changes
+          // near the cursor is the SOURCE crop: it shrinks toward its own
+          // center and gets stretched back up to fill the tile, so the
+          // image warps/zooms in on itself instead of the tile shrinking
+          // away to a gap.
+          const cropFraction = Math.max(0.015, 1 - influence);
+          const cropW = sw * cropFraction;
+          const cropH = sh * cropFraction;
+          const cropX = sx + (sw - cropW) / 2;
+          const cropY = sy + (sh - cropH) / 2;
+
+          context.drawImage(image, cropX, cropY, cropW, cropH, x, y, tile, tile);
+
+          // A white dot grows in on top as the crop warps, matching the
+          // reference's halftone-dot look right at the cursor.
+          const dotRadius = tile * 0.16 * influence;
+          if (dotRadius > 0.6) {
+            context.beginPath();
+            context.arc(x + tile / 2, y + tile / 2, dotRadius, 0, Math.PI * 2);
+            context.fillStyle = "#fff";
+            context.fill();
+          }
         }
       }
     }
@@ -339,13 +403,11 @@
       focusActive = false;
       gallery.classList.remove("is-focused");
       clearRelatedImages();
-      startAutoplay();
     }
 
     function enterFocus() {
       if (focusActive) return;
       focusActive = true;
-      stopAutoplay();
       gallery.classList.add("is-focused");
       const data = window.SITE_ARCHIVE || [];
       const activeCard = cards[activeIndex];
@@ -355,6 +417,16 @@
 
     cards.forEach((card, index) => {
       card.addEventListener("click", () => {
+        // Mobile: no coverflow, no select()/focus-mode — the layout is a
+        // vertical zigzag list (see styles.css) and a single tap just
+        // opens the same close-up lightbox the primary project photos
+        // use. Desktop keeps the existing click-to-center / second-click-
+        // focus-mode behavior exactly as it was.
+        if (!desktop.matches) {
+          select(index);
+          openLightboxWith?.(card);
+          return;
+        }
         if (index === activeIndex) {
           if (focusActive) exitFocus();
           else enterFocus();
@@ -398,34 +470,31 @@
       });
     }
 
-    // Slow auto-advance for the satellite cards — the centered card just
-    // ends up being whichever one is currently active, nothing here moves
-    // it directly. Pauses on hover/focus so it never fights a click, an
-    // arrow-key nav, or the pointermove float effect above; off entirely
-    // under reduced motion or a coarse (touch) pointer.
-    const AUTOPLAY_INTERVAL_MS = 5200;
-    let autoplayTimer = 0;
+    // Slow ambient drift for the satellite cards only — the centered card
+    // (position 0) never moves on its own; select() is the only thing
+    // that ever changes which project is centered, unchanged from before.
+    // Each satellite gently drifts back and forth on its own sine-wave
+    // phase, added on top of the pointermove parallax above (same
+    // --float-x/--float-y custom properties, see the .depth-card
+    // `translate` rule in styles.css) rather than replacing it.
+    let idleFrame = 0;
 
-    function stopAutoplay() {
-      window.clearInterval(autoplayTimer);
-      autoplayTimer = 0;
+    function idleDrift(timestamp) {
+      idleFrame = window.requestAnimationFrame(idleDrift);
+      if (reducedMotion.matches || !desktop.matches || focusActive) return;
+      cards.forEach((card, index) => {
+        if (card.dataset.position === "0") return;
+        const phase = index * 1.7;
+        const driftX = Math.sin(timestamp / 3400 + phase) * 7;
+        const driftY = Math.cos(timestamp / 4300 + phase) * 5;
+        card.style.setProperty("--idle-x", `${driftX}px`);
+        card.style.setProperty("--idle-y", `${driftY}px`);
+      });
     }
 
-    function startAutoplay() {
-      if (reducedMotion.matches || coarsePointer.matches || cards.length < 2) return;
-      stopAutoplay();
-      autoplayTimer = window.setInterval(() => select(activeIndex + 1), AUTOPLAY_INTERVAL_MS);
-    }
-
-    gallery.addEventListener("pointerenter", stopAutoplay);
-    gallery.addEventListener("pointerleave", startAutoplay);
-    gallery.addEventListener("focusin", stopAutoplay);
-    gallery.addEventListener("focusout", startAutoplay);
-    reducedMotion.addEventListener?.("change", startAutoplay);
-    coarsePointer.addEventListener?.("change", startAutoplay);
+    if (!reducedMotion.matches) idleFrame = window.requestAnimationFrame(idleDrift);
 
     select(0);
-    startAutoplay();
   }
 
   document.querySelectorAll("[data-depth-gallery]").forEach(initDepthGallery);
@@ -520,6 +589,8 @@
     lightbox.addEventListener("click", (event) => {
       if (event.target === lightbox) close();
     });
+
+    openLightboxWith = open;
   }
 
   initLightbox();
