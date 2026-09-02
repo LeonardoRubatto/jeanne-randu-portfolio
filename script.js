@@ -86,7 +86,12 @@
   // crossfade never fights the panel-to-panel transition.
   const STAGE_WINDOWS_DESKTOP = {
     cabane: [0.05, 0.14],
-    nike: [0.32, 0.4],
+    // Nike's own reveal finishes at 0.31 and véranda's starts covering it
+    // at 0.37 (see REVEAL_WINDOWS_DEFAULT), so this only has a 0.06
+    // window to work with — pushed further into it (was 0.32-0.4, started
+    // almost immediately after nike settled) so the first poster gets
+    // real time on screen before the crossfade begins.
+    nike: [0.345, 0.365],
     cave: [0.93, 0.99],
   };
 
@@ -227,6 +232,12 @@
     } else {
       let mobileStageFrame = 0;
 
+      // Nike gets a later-starting window than the default — same reason
+      // as STAGE_WINDOWS_DESKTOP above, more time on the first poster
+      // before it crossfades.
+      const STAGE_WINDOW_MOBILE_DEFAULT = [0.55, 0.85];
+      const STAGE_WINDOWS_MOBILE = { nike: [0.68, 0.85] };
+
       function updateMobileStages() {
         mobileStageFrame = 0;
         if (desktop.matches) return;
@@ -235,7 +246,8 @@
           const viewportHeight = window.innerHeight;
           const total = Math.max(1, viewportHeight + rect.height);
           const raw = clamp((viewportHeight - rect.top) / total);
-          applyStageProgress(panel, range(raw, 0.55, 0.85));
+          const w = STAGE_WINDOWS_MOBILE[panel.dataset.stagePanel] || STAGE_WINDOW_MOBILE_DEFAULT;
+          applyStageProgress(panel, range(raw, w[0], w[1]));
         });
       }
 
