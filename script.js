@@ -70,13 +70,20 @@
   function applyStageProgress(panel, local) {
     const fadeOut = 1 - range(local, 0, 0.5);
     const fadeIn = range(local, 0.5, 1);
+    // "auto", not "" — [data-stage="2"]'s own CSS default is
+    // pointer-events: none (so it doesn't intercept clicks/hover while
+    // invisible pre-crossfade); clearing the inline override back to ""
+    // just falls back to that permanent none, leaving it unhoverable and
+    // unclickable forever even once fully faded in. Stage 1 has no such
+    // CSS default (auto already), so "" would've been fine there too,
+    // but being explicit on both sides keeps the two branches symmetric.
     panel.querySelectorAll('[data-stage="1"]').forEach((el) => {
       el.style.opacity = String(fadeOut);
-      el.style.pointerEvents = fadeOut < 0.05 ? "none" : "";
+      el.style.pointerEvents = fadeOut < 0.05 ? "none" : "auto";
     });
     panel.querySelectorAll('[data-stage="2"]').forEach((el) => {
       el.style.opacity = String(fadeIn);
-      el.style.pointerEvents = fadeIn < 0.05 ? "none" : "";
+      el.style.pointerEvents = fadeIn < 0.05 ? "none" : "auto";
     });
   }
 
@@ -472,16 +479,37 @@
       if (!images.length) return;
       const container = document.createElement("div");
       container.className = "depth-related";
-      container.setAttribute("aria-hidden", "true");
+      // The active card is only ~35vw wide, centered, in a full-width
+      // gallery — there's real room either side of it on desktop. Angle 0
+      // starts pointing right (not up), so two images land left/right of
+      // the image instead of directly above/below it (dead center
+      // horizontally, i.e. on top of it — which is what was happening).
+      const radiusX = 44;
+      const radiusY = 20;
       images.forEach((src, index) => {
-        const angle = (index / images.length) * Math.PI * 2 - Math.PI / 2;
+        const angle = (index / images.length) * Math.PI * 2;
         const img = document.createElement("img");
         img.src = src;
-        img.alt = "";
+        img.alt = `Autre vue du projet ${project.title || ""}`.trim();
         img.loading = "lazy";
-        img.style.left = `${50 + Math.cos(angle) * 34}%`;
-        img.style.top = `${38 + Math.sin(angle) * 30}%`;
+        img.className = "is-closeupable";
+        img.tabIndex = 0;
+        img.setAttribute("role", "button");
+        img.setAttribute("aria-label", `Agrandir : ${img.alt}`);
+        img.style.left = `${50 + Math.cos(angle) * radiusX}%`;
+        img.style.top = `${46 + Math.sin(angle) * radiusY}%`;
         img.style.transitionDelay = `${index * 60}ms`;
+        // Same close-up lightbox every other photo on the site uses.
+        img.addEventListener("click", (event) => {
+          event.stopPropagation();
+          openLightboxWith?.(img);
+        });
+        img.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          event.stopPropagation();
+          openLightboxWith?.(img);
+        });
         container.appendChild(img);
       });
       gallery.appendChild(container);

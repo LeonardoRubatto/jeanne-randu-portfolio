@@ -1190,14 +1190,23 @@ button {
 
 .depth-related img {
   position: absolute;
-  width: 84px;
-  height: 108px;
+  z-index: 1;
+  width: 148px;
+  height: 192px;
   object-fit: cover;
   border: 4px solid var(--paper-light);
   box-shadow: 0 12px 32px rgba(5, 7, 4, 0.35);
   opacity: 0;
+  pointer-events: auto;
+  cursor: pointer;
   transform: translate(-50%, -50%) scale(0.7);
-  transition: opacity 400ms var(--ease), transform 400ms var(--ease);
+  transition: opacity 400ms var(--ease), transform 400ms var(--ease), z-index 0s;
+}
+
+.depth-related img:hover,
+.depth-related img:focus-visible {
+  z-index: 2;
+  transform: translate(-50%, -50%) scale(1.06);
 }
 
 .depth-related.is-visible img {
