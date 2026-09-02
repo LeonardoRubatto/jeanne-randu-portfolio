@@ -26,6 +26,29 @@
     card.style.transform = `translate(${x}%, ${y}%) translateY(${lift}px) rotate(${rotation * progress}deg) scale(${scale})`;
   }
 
+  // Hand-tuned for today's 4 primary panels — interleaved on purpose with
+  // the véranda photo-stack's own arrival windows below (panel 3's window
+  // only starts at 0.77, after the photo stack has had room to fan out).
+  // A panel count other than 4 falls back to evenly-spaced windows in
+  // revealWindowsFor() rather than leaving later panels' clip-path
+  // undefined — but that fallback is a safety net, not a substitute for
+  // hand-tuning a new primary panel's choreography (see CONTENT.md).
+  const REVEAL_WINDOWS_DEFAULT = [
+    [0.16, 0.31],
+    [0.37, 0.52],
+    [0.77, 0.91],
+  ];
+
+  function revealWindowsFor(count) {
+    if (count - 1 === REVEAL_WINDOWS_DEFAULT.length) return REVEAL_WINDOWS_DEFAULT;
+    const windows = [];
+    for (let index = 1; index < count; index += 1) {
+      const span = 1 / count;
+      windows.push([index * span - span * 0.4, index * span + span * 0.1]);
+    }
+    return windows;
+  }
+
   function updateScrollScenes() {
     scrollFrame = 0;
 
@@ -41,11 +64,13 @@
     const rect = projectsSection.getBoundingClientRect();
     const travel = Math.max(1, projectsSection.offsetHeight - window.innerHeight);
     const progress = clamp(-rect.top / travel);
-    const reveals = [1, range(progress, 0.16, 0.31), range(progress, 0.37, 0.52), range(progress, 0.77, 0.91)];
+    const revealWindows = revealWindowsFor(projectPanels.length);
 
     projectPanels.forEach((panel, index) => {
       if (index === 0) return;
-      panel.style.clipPath = `inset(0 ${(1 - reveals[index]) * 100}% 0 0)`;
+      const [start, end] = revealWindows[index - 1];
+      const reveal = range(progress, start, end);
+      panel.style.clipPath = `inset(0 ${(1 - reveal) * 100}% 0 0)`;
     });
 
     photoCards.forEach((card, index) => {
@@ -64,12 +89,25 @@
   desktop.addEventListener?.("change", requestScrollUpdate);
   reducedMotion.addEventListener?.("change", requestScrollUpdate);
 
+  // Hand-tuned for today's 4 index-list entries, same reasoning as
+  // REVEAL_WINDOWS_DEFAULT above — kept exact for 4, evenly spaced
+  // otherwise so a jump target never comes back undefined.
+  const JUMP_STOPS_DEFAULT = [0.02, 0.32, 0.6, 0.92];
+
+  function jumpStopsFor(count) {
+    if (count === JUMP_STOPS_DEFAULT.length) return JUMP_STOPS_DEFAULT;
+    if (count <= 1) return [0.02];
+    const first = JUMP_STOPS_DEFAULT[0];
+    const last = JUMP_STOPS_DEFAULT[JUMP_STOPS_DEFAULT.length - 1];
+    return Array.from({ length: count }, (_, index) => first + (last - first) * (index / (count - 1)));
+  }
+
   document.querySelectorAll("[data-project-jump]").forEach((link) => {
     link.addEventListener("click", (event) => {
       if (!projectsSection || !desktop.matches || reducedMotion.matches) return;
       event.preventDefault();
       const index = Number(link.dataset.projectJump || 0);
-      const stops = [0.02, 0.32, 0.6, 0.92];
+      const stops = jumpStopsFor(projectPanels.length);
       const travel = projectsSection.offsetHeight - window.innerHeight;
       window.scrollTo({
         top: projectsSection.offsetTop + travel * stops[index],

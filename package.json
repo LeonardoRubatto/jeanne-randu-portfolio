@@ -10,7 +10,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "start": "vite preview --host 0.0.0.0",
-    "check": "node --check script.js"
+    "sync": "node scripts/sync-content.mjs",
+    "check": "node --check script.js && node --check render.js && node --check scripts/sync-content.mjs"
   },
   "devDependencies": {
     "@openai/sites-vite-plugin": "0.2.0",

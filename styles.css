@@ -161,7 +161,8 @@ button {
 }
 
 .topbar nav a::after,
-.footer-bottom a::after {
+.footer-bottom a::after,
+.footer-contact a::after {
   position: absolute;
   right: 0;
   bottom: -4px;
@@ -177,7 +178,9 @@ button {
 .topbar nav a:hover::after,
 .topbar nav a:focus-visible::after,
 .footer-bottom a:hover::after,
-.footer-bottom a:focus-visible::after {
+.footer-bottom a:focus-visible::after,
+.footer-contact a:hover::after,
+.footer-contact a:focus-visible::after {
   transform: scaleX(1);
   transform-origin: left;
 }
@@ -510,6 +513,11 @@ button {
 .project-panel:nth-child(2) { z-index: 2; clip-path: inset(0 100% 0 0); }
 .project-panel:nth-child(3) { z-index: 3; clip-path: inset(0 100% 0 0); }
 .project-panel:nth-child(4) { z-index: 4; clip-path: inset(0 100% 0 0); }
+/* Headroom for a 5th/6th primary project — still finite, not generated
+   from data (CSS can't read csv/projects.csv). Adding a 7th needs one more
+   :nth-child(7) rule following the same pattern. */
+.project-panel:nth-child(5) { z-index: 5; clip-path: inset(0 100% 0 0); }
+.project-panel:nth-child(6) { z-index: 6; clip-path: inset(0 100% 0 0); }
 
 .panel-copy {
   position: absolute;
@@ -947,6 +955,10 @@ button {
 .archive[data-mood="2"] { background: #282722; }
 .archive[data-mood="3"] { background: #1c2420; }
 .archive[data-mood="4"] { background: #30251f; }
+/* Headroom for a 6th archive card; a 7th falls back to the base
+   background (still fine, just loses the per-card mood tint) until one
+   more rule is added here. */
+.archive[data-mood="5"] { background: #23201c; }
 
 .section-heading--archive {
   border-color: var(--line-light);
@@ -1080,6 +1092,21 @@ button {
   transform: translateZ(-168px) rotate(-3deg);
 }
 
+/* Headroom for a 6th archive card: initDepthGallery()'s coverflow math
+   (script.js) puts any card past ±2 on the negative side first, so a 6th
+   card needs this one extra slot. A 7th needs data-position="-4" added
+   the same way, and the formula itself stops being symmetric past 6 —
+   worth revisiting the position formula rather than chasing it with more
+   rules if the archive regularly grows past 6. */
+.depth-card[data-position="-3"] {
+  z-index: 2;
+  top: 70%;
+  left: 3%;
+  width: min(13vw, 190px);
+  height: 25%;
+  transform: translateZ(-220px) rotate(5deg);
+}
+
 .depth-card:not([data-position="0"]):hover,
 .depth-card:not([data-position="0"]):focus-visible {
   opacity: 0.9;
@@ -1127,12 +1154,6 @@ button {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-
-.depth-gallery-hint i {
-  width: 40px;
-  height: 1px;
-  background: currentColor;
 }
 
 .about {
@@ -1223,10 +1244,23 @@ button {
 }
 
 .site-footer > p {
-  margin: 72px 0 88px;
+  margin: 72px 0 32px;
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.footer-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  margin: 0 0 56px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.footer-contact a {
+  position: relative;
 }
 
 .footer-bottom {
@@ -1554,6 +1588,13 @@ button {
     height: 23%;
   }
 
+  .depth-card[data-position="-3"] {
+    top: 64%;
+    left: -8%;
+    width: 24vw;
+    height: 20%;
+  }
+
   .depth-gallery-label {
     bottom: 5%;
     width: 80vw;
@@ -1577,7 +1618,8 @@ button {
   }
 
   .site-footer { padding: 80px 16px 24px; }
-  .site-footer > p { margin: 56px 0 64px; }
+  .site-footer > p { margin: 56px 0 28px; }
+  .footer-contact { margin-bottom: 40px; }
 
   .footer-bottom {
     grid-template-columns: 1fr;

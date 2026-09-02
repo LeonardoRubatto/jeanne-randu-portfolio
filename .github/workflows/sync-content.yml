@@ -1,0 +1,38 @@
+name: Sync content
+
+# Regenerates data/*.js from csv/*.csv whenever a CSV changes — this is
+# what lets Jeanne add/edit a project by editing a CSV in GitHub's web
+# editor without touching any code. See CONTENT.md.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "csv/**"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Sync CSV -> data/*.js
+        run: node scripts/sync-content.mjs
+
+      - name: Commit regenerated data files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/projects.js data/archive.js
+          git diff --cached --quiet || git commit -m "Sync content from csv/ [skip ci]"
+          git push

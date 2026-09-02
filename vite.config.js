@@ -9,10 +9,17 @@ function copyStaticRuntime() {
     async closeBundle() {
       await mkdir(resolve("dist"), { recursive: true });
       await mkdir(resolve("dist", "server"), { recursive: true });
+      await mkdir(resolve("dist", "data"), { recursive: true });
       await Promise.all(
-        ["script.js", "og.png", "robots.txt", "sitemap.xml"].map((file) =>
-          copyFile(resolve(file), resolve("dist", file)),
-        ),
+        [
+          "script.js",
+          "render.js",
+          "data/projects.js",
+          "data/archive.js",
+          "og.png",
+          "robots.txt",
+          "sitemap.xml",
+        ].map((file) => copyFile(resolve(file), resolve("dist", file))),
       );
       await writeFile(
         resolve("dist", "server", "index.js"),
