@@ -1241,6 +1241,23 @@ button {
   border-top: 1px solid var(--line-dark);
 }
 
+.about-lead-col {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.about-portrait {
+  width: min(220px, 60%);
+  margin: 0;
+}
+
+.about-portrait img {
+  width: 100%;
+  height: auto;
+  filter: grayscale(1) contrast(1.05);
+}
+
 .about-lead {
   margin: 0;
   font-family: var(--serif);
