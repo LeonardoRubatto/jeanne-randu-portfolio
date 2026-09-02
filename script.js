@@ -58,6 +58,47 @@
     return windows;
   }
 
+  // "Stage 2" content: cabane/nike/cave each carry a second set of media
+  // (data-stage="2") that crossfades in over the first (data-stage="1")
+  // partway through the panel's own scroll, then stays — same idea as
+  // doubling the section. Desktop drives this off the shared pinned-
+  // scroll progress (a window within that panel's own dominant range);
+  // mobile (panels aren't pinned) drives it off the panel's own position
+  // in the viewport, same technique as the véranda photo-stack below.
+  const stagePanels = Array.from(document.querySelectorAll("[data-stage-panel]"));
+
+  function applyStageProgress(panel, local) {
+    const fadeOut = 1 - range(local, 0, 0.5);
+    const fadeIn = range(local, 0.5, 1);
+    panel.querySelectorAll('[data-stage="1"]').forEach((el) => {
+      el.style.opacity = String(fadeOut);
+      el.style.pointerEvents = fadeOut < 0.05 ? "none" : "";
+    });
+    panel.querySelectorAll('[data-stage="2"]').forEach((el) => {
+      el.style.opacity = String(fadeIn);
+      el.style.pointerEvents = fadeIn < 0.05 ? "none" : "";
+    });
+  }
+
+  // Hand-tuned within the overall pinned-scroll progress: each window
+  // sits inside that panel's own dominant range (after its own reveal
+  // has finished, before the next panel's reveal takes over), so the
+  // crossfade never fights the panel-to-panel transition.
+  const STAGE_WINDOWS_DESKTOP = {
+    cabane: [0.05, 0.14],
+    nike: [0.32, 0.4],
+    cave: [0.93, 0.99],
+  };
+
+  function updateStagesDesktop(progress) {
+    stagePanels.forEach((panel) => {
+      const slug = panel.dataset.stagePanel;
+      const w = STAGE_WINDOWS_DESKTOP[slug];
+      if (!w) return;
+      applyStageProgress(panel, range(progress, w[0], w[1]));
+    });
+  }
+
   function updateScrollScenes() {
     scrollFrame = 0;
 
@@ -94,6 +135,8 @@
       const arrival = range(progress, start, start + photoPeriod * 0.5);
       placePhotoCard(card, arrival);
     });
+
+    updateStagesDesktop(progress);
   }
 
   function requestScrollUpdate() {
@@ -169,6 +212,42 @@
       window.addEventListener("resize", requestMobilePhotoUpdate, { passive: true });
       desktop.addEventListener?.("change", requestMobilePhotoUpdate);
       requestMobilePhotoUpdate();
+    }
+  }
+
+  // Mobile stage crossfade: same panels as STAGE_WINDOWS_DESKTOP above,
+  // but driven by each panel's own position in the viewport (mobile
+  // panels are normal flow, not pinned) rather than the shared pinned-
+  // scroll progress — same technique as the mobile véranda stack above.
+  // The crossfade happens in the latter part of the panel's scroll-
+  // through, once its own content/media has had room to be seen.
+  if (stagePanels.length) {
+    if (reducedMotion.matches) {
+      stagePanels.forEach((panel) => applyStageProgress(panel, 0));
+    } else {
+      let mobileStageFrame = 0;
+
+      function updateMobileStages() {
+        mobileStageFrame = 0;
+        if (desktop.matches) return;
+        stagePanels.forEach((panel) => {
+          const rect = panel.getBoundingClientRect();
+          const viewportHeight = window.innerHeight;
+          const total = Math.max(1, viewportHeight + rect.height);
+          const raw = clamp((viewportHeight - rect.top) / total);
+          applyStageProgress(panel, range(raw, 0.55, 0.85));
+        });
+      }
+
+      function requestMobileStageUpdate() {
+        if (mobileStageFrame) return;
+        mobileStageFrame = window.requestAnimationFrame(updateMobileStages);
+      }
+
+      window.addEventListener("scroll", requestMobileStageUpdate, { passive: true });
+      window.addEventListener("resize", requestMobileStageUpdate, { passive: true });
+      desktop.addEventListener?.("change", requestMobileStageUpdate);
+      requestMobileStageUpdate();
     }
   }
 

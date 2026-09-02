@@ -12,7 +12,10 @@ window.SITE_ARCHIVE = [
     "type": "Retail · Scénographie",
     "image": "./assets/projects/archive/louboutin.webp",
     "alt": "Stand Louboutin",
-    "relatedImages": []
+    "relatedImages": [
+      "./assets/projects/archive/louboutin-detail-1.webp",
+      "./assets/projects/archive/louboutin-detail-2.webp"
+    ]
   },
   {
     "slug": "residence",
@@ -22,7 +25,10 @@ window.SITE_ARCHIVE = [
     "type": "Espace intergénérationnel",
     "image": "./assets/projects/archive/residence.webp",
     "alt": "Résidence cinéma",
-    "relatedImages": []
+    "relatedImages": [
+      "./assets/projects/archive/residence-detail-1.webp",
+      "./assets/projects/archive/residence-detail-2.webp"
+    ]
   },
   {
     "slug": "chair",
@@ -32,7 +38,10 @@ window.SITE_ARCHIVE = [
     "type": "Objet · Matière",
     "image": "./assets/projects/archive/chair.webp",
     "alt": "Chaise disco",
-    "relatedImages": []
+    "relatedImages": [
+      "./assets/projects/archive/chair-detail-1.webp",
+      "./assets/projects/archive/chair-detail-2.webp"
+    ]
   },
   {
     "slug": "equilibre",

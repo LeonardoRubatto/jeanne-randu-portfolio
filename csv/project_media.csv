@@ -1,15 +1,22 @@
-slug,slot,image,alt,captionNumber,captionLabel
-## projet parent (doit exister dans projects.csv),emplacement bespoke dans la mise en page (ne pas inventer un nouveau slot sans la règle CSS qui va avec),fichier image,texte alternatif,numéro affiché sur la légende,texte de la légende
-cabane,exterior,./assets/projects/cabane/cabane-exterior.webp,Modélisation extérieure de la cabane,01,Volumétrie extérieure
-cabane,interior,./assets/projects/cabane/cabane-interior.webp,Vue intérieure en double hauteur de la cabane,02,Double hauteur
-cabane,bedroom,./assets/projects/cabane/cabane-bedroom.webp,Vue de la chambre de la cabane,03,Lumière contenue
-cabane,plan,./assets/projects/cabane/cabane-plan.webp,Plan de la cabane,04,Plan · relation au site
-nike,poster,./assets/projects/nike/nike-poster.webp,Affiche Run Your Line de l’activation Nike,,
-veranda,mood-exterior,./assets/projects/veranda/veranda-mood-exterior.webp,Palette extérieure et jardin,01,Palette extérieure & jardin
-veranda,exterior,./assets/projects/veranda/veranda-exterior.webp,Perspective extérieure dessinée à la main,02,Perspective extérieure
-veranda,interior,./assets/projects/veranda/veranda-interior.webp,Perspective intérieure de la véranda,03,Perspective intérieure
-veranda,plan,./assets/projects/veranda/veranda-plan.webp,Plan et élévations de la véranda,04,Plan & élévations
-veranda,garden,./assets/projects/veranda/veranda-garden.webp,Étude du jardin et de la relation au paysage,05,Continuité avec le jardin
-cave,main,./assets/projects/cave/cave-lounge.webp,"Espace détente de la cave, pierre et mobilier brun",01,Salon · pierre & bois
-cave,detail,./assets/projects/cave/cave-tasting.webp,Comptoir de dégustation devant un mur en pierre,02,Comptoir de dégustation
-cave,plan,./assets/projects/cave/cave-plan.webp,Vue de dessus de l’aménagement de la cave,03,Plan · circulation
+slug,slot,stage,image,alt,captionNumber,captionLabel
+## projet parent (doit exister dans projects.csv),emplacement bespoke dans la mise en page (ne pas inventer un nouveau slot sans la règle CSS qui va avec),1 = vues actuelles, 2 = second jeu qui remplace le premier au scroll (cabane/nike/cave seulement — laisser vide ou 1 sinon),fichier image,texte alternatif,numéro affiché sur la légende,texte de la légende
+cabane,exterior,1,./assets/projects/cabane/cabane-exterior.webp,Modélisation extérieure de la cabane,01,Volumétrie extérieure
+cabane,interior,1,./assets/projects/cabane/cabane-interior.webp,Vue intérieure en double hauteur de la cabane,02,Double hauteur
+cabane,bedroom,1,./assets/projects/cabane/cabane-bedroom.webp,Vue de la chambre de la cabane,03,Lumière contenue
+cabane,plan,1,./assets/projects/cabane/cabane-plan.webp,Plan de la cabane,04,Plan · relation au site
+cabane,exterior,2,./assets/projects/cabane/cabane-exterior-2.webp,Façade de la cabane vue de face,01,Vue de face
+cabane,interior,2,./assets/projects/cabane/cabane-interior-2.webp,Vue de l’entrée de la cabane,02,L’entrée
+cabane,bedroom,2,./assets/projects/cabane/cabane-bedroom-2.webp,Vue de la chambre à l’étage de la cabane,03,Chambre à l’étage
+cabane,plan,2,./assets/projects/cabane/cabane-plan-2.webp,Vue de dessus de l’étage de la cabane,04,Plan · étage
+nike,poster,1,./assets/projects/nike/nike-poster.webp,Affiche Run Your Line de l’activation Nike,,
+nike,poster,2,./assets/projects/nike/nike-poster-2.webp,Second visuel de l’activation Run Your Line,,
+veranda,mood-exterior,1,./assets/projects/veranda/veranda-mood-exterior.webp,Palette extérieure et jardin,01,Palette extérieure & jardin
+veranda,exterior,1,./assets/projects/veranda/veranda-exterior.webp,Perspective extérieure dessinée à la main,02,Perspective extérieure
+veranda,interior,1,./assets/projects/veranda/veranda-interior.webp,Perspective intérieure de la véranda,03,Perspective intérieure
+veranda,plan,1,./assets/projects/veranda/veranda-plan.webp,Plan et élévations de la véranda,04,Plan & élévations
+veranda,garden,1,./assets/projects/veranda/veranda-garden.webp,Étude du jardin et de la relation au paysage,05,Continuité avec le jardin
+cave,main,1,./assets/projects/cave/cave-lounge.webp,"Espace détente de la cave, pierre et mobilier brun",01,Salon · pierre & bois
+cave,detail,1,./assets/projects/cave/cave-tasting.webp,Comptoir de dégustation devant un mur en pierre,02,Comptoir de dégustation
+cave,plan,1,./assets/projects/cave/cave-plan.webp,Vue de dessus de l’aménagement de la cave,03,Plan · circulation
+cave,exhibition,2,./assets/projects/cave/cave-exhibition.webp,Zone d’exposition de la cave,01,Zone d’exposition
+cave,overview,2,./assets/projects/cave/cave-overview.webp,Vue de dessus de la cave,02,Vue d’ensemble

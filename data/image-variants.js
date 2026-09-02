@@ -23,6 +23,21 @@ window.SITE_IMAGE_VARIANTS = {
   "./assets/projects/cabane/cabane-plan.webp": [
     640
   ],
+  "./assets/projects/cabane/cabane-exterior-2.webp": [
+    640
+  ],
+  "./assets/projects/cabane/cabane-interior-2.webp": [
+    640,
+    960
+  ],
+  "./assets/projects/cabane/cabane-bedroom-2.webp": [
+    640,
+    960
+  ],
+  "./assets/projects/cabane/cabane-plan-2.webp": [
+    640,
+    960
+  ],
   "./assets/projects/nike/nike-storefront.webp": [
     640,
     960,
@@ -30,6 +45,9 @@ window.SITE_IMAGE_VARIANTS = {
   ],
   "./assets/projects/nike/nike-poster.webp": [
     525
+  ],
+  "./assets/projects/nike/nike-poster-2.webp": [
+    510
   ],
   "./assets/projects/veranda/veranda-mood-exterior.webp": [
     640,
@@ -67,7 +85,23 @@ window.SITE_IMAGE_VARIANTS = {
   "./assets/projects/cave/cave-plan.webp": [
     640
   ],
+  "./assets/projects/cave/cave-exhibition.webp": [
+    640,
+    960,
+    1536
+  ],
+  "./assets/projects/cave/cave-overview.webp": [
+    640
+  ],
   "./assets/projects/archive/louboutin.webp": [
+    640,
+    960
+  ],
+  "./assets/projects/archive/louboutin-detail-1.webp": [
+    640,
+    960
+  ],
+  "./assets/projects/archive/louboutin-detail-2.webp": [
     640,
     960
   ],
@@ -75,7 +109,20 @@ window.SITE_IMAGE_VARIANTS = {
     640,
     960
   ],
+  "./assets/projects/archive/residence-detail-1.webp": [
+    591
+  ],
+  "./assets/projects/archive/residence-detail-2.webp": [
+    640,
+    960
+  ],
   "./assets/projects/archive/chair.webp": [
+    640
+  ],
+  "./assets/projects/archive/chair-detail-1.webp": [
+    640
+  ],
+  "./assets/projects/archive/chair-detail-2.webp": [
     640
   ],
   "./assets/projects/archive/equilibre.webp": [

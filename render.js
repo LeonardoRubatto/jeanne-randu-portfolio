@@ -84,13 +84,19 @@
       if (target === "src" && el.tagName === "IMG") applyPictureSources(el, value);
     } else {
       el.textContent = value;
+      // h2Middle ("dans les" on cabane) is empty for every other project —
+      // hide the element rather than leave a stray blank line.
+      if (field === "h2Middle") el.hidden = !value;
     }
   });
 
+  // Keyed by slot AND stage, not just slot — cabane/nike/cave each have a
+  // second "stage 2" media set that replaces the first on scroll (see
+  // script.js's initStageCrossfade), reusing the same slot names.
   const mediaByKey = {};
   (window.SITE_PROJECTS || []).forEach((project) => {
     (project.media || []).forEach((media) => {
-      mediaByKey[`${project.slug}.${media.slot}`] = media;
+      mediaByKey[`${project.slug}.${media.slot}.${media.stage}`] = media;
     });
   });
 

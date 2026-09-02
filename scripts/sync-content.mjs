@@ -111,6 +111,7 @@ const projects = projectRows.map((row) => ({
   indexMeta: row.indexMeta,
   panelType: row.panelType,
   h2Line1: row.h2Line1,
+  h2Middle: row.h2Middle,
   h2Line2: row.h2Line2,
   description: row.description,
   heroImage: row.heroImage,
@@ -122,6 +123,7 @@ const projects = projectRows.map((row) => ({
     .filter((media) => media.slug === row.slug)
     .map((media) => ({
       slot: media.slot,
+      stage: Number(media.stage) || 1,
       image: media.image,
       alt: media.alt,
       captionNumber: media.captionNumber,

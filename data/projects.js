@@ -12,6 +12,7 @@ window.SITE_PROJECTS = [
     "indexMeta": "Cabane bois · Architecture intérieure",
     "panelType": "Habiter le paysage · Architecture intérieure",
     "h2Line1": "Cabane",
+    "h2Middle": "dans les",
     "h2Line2": "bois",
     "description": "L’intention était de concevoir un espace qui ne cherche pas à s’imposer dans son environnement, mais à en prolonger l’atmosphère. Une manière d’habiter le paysage : ralentir, observer et laisser la nature participer à l’espace.",
     "heroImage": "./assets/projects/cabane/cabane-hero.webp",
@@ -22,6 +23,7 @@ window.SITE_PROJECTS = [
     "media": [
       {
         "slot": "exterior",
+        "stage": 1,
         "image": "./assets/projects/cabane/cabane-exterior.webp",
         "alt": "Modélisation extérieure de la cabane",
         "captionNumber": "01",
@@ -29,6 +31,7 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "interior",
+        "stage": 1,
         "image": "./assets/projects/cabane/cabane-interior.webp",
         "alt": "Vue intérieure en double hauteur de la cabane",
         "captionNumber": "02",
@@ -36,6 +39,7 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "bedroom",
+        "stage": 1,
         "image": "./assets/projects/cabane/cabane-bedroom.webp",
         "alt": "Vue de la chambre de la cabane",
         "captionNumber": "03",
@@ -43,10 +47,43 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "plan",
+        "stage": 1,
         "image": "./assets/projects/cabane/cabane-plan.webp",
         "alt": "Plan de la cabane",
         "captionNumber": "04",
         "captionLabel": "Plan · relation au site"
+      },
+      {
+        "slot": "exterior",
+        "stage": 2,
+        "image": "./assets/projects/cabane/cabane-exterior-2.webp",
+        "alt": "Façade de la cabane vue de face",
+        "captionNumber": "01",
+        "captionLabel": "Vue de face"
+      },
+      {
+        "slot": "interior",
+        "stage": 2,
+        "image": "./assets/projects/cabane/cabane-interior-2.webp",
+        "alt": "Vue de l’entrée de la cabane",
+        "captionNumber": "02",
+        "captionLabel": "L’entrée"
+      },
+      {
+        "slot": "bedroom",
+        "stage": 2,
+        "image": "./assets/projects/cabane/cabane-bedroom-2.webp",
+        "alt": "Vue de la chambre à l’étage de la cabane",
+        "captionNumber": "03",
+        "captionLabel": "Chambre à l’étage"
+      },
+      {
+        "slot": "plan",
+        "stage": 2,
+        "image": "./assets/projects/cabane/cabane-plan-2.webp",
+        "alt": "Vue de dessus de l’étage de la cabane",
+        "captionNumber": "04",
+        "captionLabel": "Plan · étage"
       }
     ]
   },
@@ -58,6 +95,7 @@ window.SITE_PROJECTS = [
     "indexMeta": "Nike · Scénographie événementielle",
     "panelType": "Activer la ville · Scénographie événementielle",
     "h2Line1": "Run your",
+    "h2Middle": "",
     "h2Line2": "line",
     "description": "Une salle de sport éphémère en plein air, pensée pour rendre le sport accessible et engager la communauté. Inspirées du swoosh, les lignes colorées incarnent trajectoire, énergie et diversité des parcours.",
     "heroImage": "./assets/projects/nike/nike-storefront.webp",
@@ -68,8 +106,17 @@ window.SITE_PROJECTS = [
     "media": [
       {
         "slot": "poster",
+        "stage": 1,
         "image": "./assets/projects/nike/nike-poster.webp",
         "alt": "Affiche Run Your Line de l’activation Nike",
+        "captionNumber": "",
+        "captionLabel": ""
+      },
+      {
+        "slot": "poster",
+        "stage": 2,
+        "image": "./assets/projects/nike/nike-poster-2.webp",
+        "alt": "Second visuel de l’activation Run Your Line",
         "captionNumber": "",
         "captionLabel": ""
       }
@@ -83,6 +130,7 @@ window.SITE_PROJECTS = [
     "indexMeta": "Véranda · Aménagement",
     "panelType": "Prolonger l’existant · Aménagement",
     "h2Line1": "La",
+    "h2Middle": "",
     "h2Line2": "véranda",
     "description": "Un travail sur la relation entre usages, volumes, matières et environnement, avec la volonté de créer un espace fonctionnel, esthétique et agréable à vivre. La conception s’appuie sur une continuité visuelle et matérielle.",
     "heroImage": "./assets/projects/veranda/veranda-interior.webp",
@@ -93,6 +141,7 @@ window.SITE_PROJECTS = [
     "media": [
       {
         "slot": "mood-exterior",
+        "stage": 1,
         "image": "./assets/projects/veranda/veranda-mood-exterior.webp",
         "alt": "Palette extérieure et jardin",
         "captionNumber": "01",
@@ -100,6 +149,7 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "exterior",
+        "stage": 1,
         "image": "./assets/projects/veranda/veranda-exterior.webp",
         "alt": "Perspective extérieure dessinée à la main",
         "captionNumber": "02",
@@ -107,6 +157,7 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "interior",
+        "stage": 1,
         "image": "./assets/projects/veranda/veranda-interior.webp",
         "alt": "Perspective intérieure de la véranda",
         "captionNumber": "03",
@@ -114,6 +165,7 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "plan",
+        "stage": 1,
         "image": "./assets/projects/veranda/veranda-plan.webp",
         "alt": "Plan et élévations de la véranda",
         "captionNumber": "04",
@@ -121,6 +173,7 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "garden",
+        "stage": 1,
         "image": "./assets/projects/veranda/veranda-garden.webp",
         "alt": "Étude du jardin et de la relation au paysage",
         "captionNumber": "05",
@@ -136,6 +189,7 @@ window.SITE_PROJECTS = [
     "indexMeta": "Cave · Dégustation & exposition",
     "panelType": "Creuser l’atmosphère · Dégustation & exposition",
     "h2Line1": "La",
+    "h2Middle": "",
     "h2Line2": "cave",
     "description": "Pierre, bois et lumière maîtrisée donnent au lieu une identité sobre et intemporelle. L’architecture accompagne la découverte du vin sans prendre le dessus sur l’expérience.",
     "heroImage": "./assets/projects/cave/cave-lounge.webp",
@@ -146,6 +200,7 @@ window.SITE_PROJECTS = [
     "media": [
       {
         "slot": "main",
+        "stage": 1,
         "image": "./assets/projects/cave/cave-lounge.webp",
         "alt": "Espace détente de la cave, pierre et mobilier brun",
         "captionNumber": "01",
@@ -153,6 +208,7 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "detail",
+        "stage": 1,
         "image": "./assets/projects/cave/cave-tasting.webp",
         "alt": "Comptoir de dégustation devant un mur en pierre",
         "captionNumber": "02",
@@ -160,10 +216,27 @@ window.SITE_PROJECTS = [
       },
       {
         "slot": "plan",
+        "stage": 1,
         "image": "./assets/projects/cave/cave-plan.webp",
         "alt": "Vue de dessus de l’aménagement de la cave",
         "captionNumber": "03",
         "captionLabel": "Plan · circulation"
+      },
+      {
+        "slot": "exhibition",
+        "stage": 2,
+        "image": "./assets/projects/cave/cave-exhibition.webp",
+        "alt": "Zone d’exposition de la cave",
+        "captionNumber": "01",
+        "captionLabel": "Zone d’exposition"
+      },
+      {
+        "slot": "overview",
+        "stage": 2,
+        "image": "./assets/projects/cave/cave-overview.webp",
+        "alt": "Vue de dessus de la cave",
+        "captionNumber": "02",
+        "captionLabel": "Vue d’ensemble"
       }
     ]
   }

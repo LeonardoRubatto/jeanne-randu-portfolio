@@ -153,7 +153,7 @@
 
       <section class="projects-scroll" id="projets" aria-label="Projets principaux">
         <div class="projects-pin">
-          <article class="project-panel project-panel--cabane" id="cabane">
+          <article class="project-panel project-panel--cabane" id="cabane" data-stage-panel="cabane">
             <div class="cabane-backdrop" aria-hidden="true">
               <picture>
                 <source type="image/avif" srcset="./assets/projects/cabane/cabane-hero-640.avif 640w, ./assets/projects/cabane/cabane-hero-960.avif 960w" sizes="100vw">
@@ -162,38 +162,55 @@
               </picture>
             </div>
             <div class="cabane-media-board" data-field="cabane.galleryAriaLabel" data-field-target="aria-label" aria-label="Vues du projet Cabane bois">
-              <figure class="project-media cabane-media cabane-media--exterior">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.exterior" src="./assets/projects/cabane/cabane-exterior.webp" alt="Modélisation extérieure de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption"><span data-media="cabane.exterior" data-media-target="number">01</span><strong data-media="cabane.exterior" data-media-target="label">Volumétrie extérieure</strong></figcaption>
+              <figure class="project-media cabane-media cabane-media--exterior" data-stage="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.exterior.1" src="./assets/projects/cabane/cabane-exterior.webp" alt="Modélisation extérieure de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cabane.exterior.1" data-media-target="number">01</span><strong data-media="cabane.exterior.1" data-media-target="label">Volumétrie extérieure</strong></figcaption>
               </figure>
-              <figure class="project-media cabane-media cabane-media--interior">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.interior" src="./assets/projects/cabane/cabane-interior.webp" alt="Vue intérieure en double hauteur de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption"><span data-media="cabane.interior" data-media-target="number">02</span><strong data-media="cabane.interior" data-media-target="label">Double hauteur</strong></figcaption>
+              <figure class="project-media cabane-media cabane-media--interior" data-stage="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.interior.1" src="./assets/projects/cabane/cabane-interior.webp" alt="Vue intérieure en double hauteur de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cabane.interior.1" data-media-target="number">02</span><strong data-media="cabane.interior.1" data-media-target="label">Double hauteur</strong></figcaption>
               </figure>
-              <figure class="project-media cabane-media cabane-media--bedroom">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.bedroom" src="./assets/projects/cabane/cabane-bedroom.webp" alt="Vue de la chambre de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption"><span data-media="cabane.bedroom" data-media-target="number">03</span><strong data-media="cabane.bedroom" data-media-target="label">Lumière contenue</strong></figcaption>
+              <figure class="project-media cabane-media cabane-media--bedroom" data-stage="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.bedroom.1" src="./assets/projects/cabane/cabane-bedroom.webp" alt="Vue de la chambre de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cabane.bedroom.1" data-media-target="number">03</span><strong data-media="cabane.bedroom.1" data-media-target="label">Lumière contenue</strong></figcaption>
               </figure>
-              <figure class="project-media cabane-media cabane-media--plan">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.plan" src="./assets/projects/cabane/cabane-plan.webp" alt="Plan de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption media-caption--dark"><span data-media="cabane.plan" data-media-target="number">04</span><strong data-media="cabane.plan" data-media-target="label">Plan · relation au site</strong></figcaption>
+              <figure class="project-media cabane-media cabane-media--plan" data-stage="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.plan.1" src="./assets/projects/cabane/cabane-plan.webp" alt="Plan de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="cabane.plan.1" data-media-target="number">04</span><strong data-media="cabane.plan.1" data-media-target="label">Plan · relation au site</strong></figcaption>
+              </figure>
+              <figure class="project-media cabane-media cabane-media--exterior" data-stage="2">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.exterior.2" src="./assets/projects/cabane/cabane-exterior-2.webp" alt="Façade de la cabane vue de face" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cabane.exterior.2" data-media-target="number">01</span><strong data-media="cabane.exterior.2" data-media-target="label">Vue de face</strong></figcaption>
+              </figure>
+              <figure class="project-media cabane-media cabane-media--interior" data-stage="2">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.interior.2" src="./assets/projects/cabane/cabane-interior-2.webp" alt="Vue de l’entrée de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cabane.interior.2" data-media-target="number">02</span><strong data-media="cabane.interior.2" data-media-target="label">L’entrée</strong></figcaption>
+              </figure>
+              <figure class="project-media cabane-media cabane-media--bedroom" data-stage="2">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.bedroom.2" src="./assets/projects/cabane/cabane-bedroom-2.webp" alt="Vue de la chambre à l’étage de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cabane.bedroom.2" data-media-target="number">03</span><strong data-media="cabane.bedroom.2" data-media-target="label">Chambre à l’étage</strong></figcaption>
+              </figure>
+              <figure class="project-media cabane-media cabane-media--plan" data-stage="2">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 30vw, 55vw"><source type="image/webp" sizes="(min-width: 900px) 30vw, 55vw"><img data-media="cabane.plan.2" src="./assets/projects/cabane/cabane-plan-2.webp" alt="Vue de dessus de l’étage de la cabane" width="1200" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="cabane.plan.2" data-media-target="number">04</span><strong data-media="cabane.plan.2" data-media-target="label">Plan · étage</strong></figcaption>
               </figure>
             </div>
             <div class="panel-copy panel-copy--light">
               <span class="panel-number" data-field="cabane.number">01</span>
               <p class="panel-type" data-field="cabane.panelType">Habiter le paysage · Architecture intérieure</p>
-              <h2><span data-field="cabane.h2Line1">Cabane</span><br><em data-field="cabane.h2Line2">bois</em></h2>
+              <h2><span data-field="cabane.h2Line1">Cabane</span><br><small data-field="cabane.h2Middle">dans les</small> <em data-field="cabane.h2Line2">bois</em></h2>
               <p class="panel-description" data-field="cabane.description">L’intention était de concevoir un espace qui ne cherche pas à s’imposer dans son environnement, mais à en prolonger l’atmosphère. Une manière d’habiter le paysage : ralentir, observer et laisser la nature participer à l’espace.</p>
             </div>
             <div class="panel-foot panel-foot--light"><span data-field="cabane.footerTag1">Matière brute</span><span data-field="cabane.footerTag2">Immersion</span><span data-field="cabane.footerTag3">Double hauteur</span></div>
           </article>
 
-          <article class="project-panel project-panel--nike" id="nike">
+          <article class="project-panel project-panel--nike" id="nike" data-stage-panel="nike">
             <div class="nike-canvas-wrap">
               <img class="nike-mosaic-source" id="nike-mosaic-source" src="./assets/projects/nike/nike-storefront.webp" alt="" aria-hidden="true">
               <canvas class="nike-canvas" data-mosaic-source="nike-mosaic-source" role="img" data-field="nike.galleryAriaLabel" data-field-target="aria-label" aria-label="Activation sportive Nike implantée au centre-ville de Tours"></canvas>
             </div>
-            <picture><source type="image/avif" sizes="(min-width: 900px) 19vw, 32vw"><source type="image/webp" sizes="(min-width: 900px) 19vw, 32vw"><img class="nike-poster" data-media="nike.poster" src="./assets/projects/nike/nike-poster.webp" alt="Affiche Run Your Line de l’activation Nike" width="800" height="1200" loading="lazy" decoding="async"></picture>
+            <picture><source type="image/avif" sizes="(min-width: 900px) 19vw, 32vw"><source type="image/webp" sizes="(min-width: 900px) 19vw, 32vw"><img class="nike-poster" data-stage="1" data-media="nike.poster.1" src="./assets/projects/nike/nike-poster.webp" alt="Affiche Run Your Line de l’activation Nike" width="800" height="1200" loading="lazy" decoding="async"></picture>
+            <picture><source type="image/avif" sizes="(min-width: 900px) 19vw, 32vw"><source type="image/webp" sizes="(min-width: 900px) 19vw, 32vw"><img class="nike-poster" data-stage="2" data-media="nike.poster.2" src="./assets/projects/nike/nike-poster-2.webp" alt="Second visuel de l’activation Run Your Line" width="800" height="1200" loading="lazy" decoding="async"></picture>
             <div class="nike-lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
             <div class="panel-copy panel-copy--nike">
               <span class="panel-number" data-field="nike.number">02</span>
@@ -207,25 +224,25 @@
           <article class="project-panel project-panel--veranda" id="veranda">
             <div class="veranda-notation" aria-hidden="true">03 / CONTINUITÉ</div>
             <div class="photo-stack" data-field="veranda.galleryAriaLabel" data-field-target="aria-label" aria-label="Étapes du projet Véranda">
-              <figure class="project-media photo-card" data-x="-49" data-y="-48" data-rotate="-9">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.mood-exterior" src="./assets/projects/veranda/veranda-mood-exterior.webp" alt="Palette extérieure et jardin" width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.mood-exterior" data-media-target="number">01</span><strong data-media="veranda.mood-exterior" data-media-target="label">Palette extérieure & jardin</strong></figcaption>
+              <figure class="project-media photo-card" data-x="-64" data-y="-58" data-rotate="-9">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.mood-exterior.1" src="./assets/projects/veranda/veranda-mood-exterior.webp" alt="Palette extérieure et jardin" width="1600" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.mood-exterior.1" data-media-target="number">01</span><strong data-media="veranda.mood-exterior.1" data-media-target="label">Palette extérieure & jardin</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-48" data-y="-50" data-rotate="5">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.exterior" src="./assets/projects/veranda/veranda-exterior.webp" alt="Perspective extérieure dessinée à la main" width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.exterior" data-media-target="number">02</span><strong data-media="veranda.exterior" data-media-target="label">Perspective extérieure</strong></figcaption>
+              <figure class="project-media photo-card" data-x="-40" data-y="-60" data-rotate="5">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.exterior.1" src="./assets/projects/veranda/veranda-exterior.webp" alt="Perspective extérieure dessinée à la main" width="1600" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.exterior.1" data-media-target="number">02</span><strong data-media="veranda.exterior.1" data-media-target="label">Perspective extérieure</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-52" data-y="-51" data-rotate="-2">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.interior" src="./assets/projects/veranda/veranda-interior.webp" alt="Perspective intérieure de la véranda" width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.interior" data-media-target="number">03</span><strong data-media="veranda.interior" data-media-target="label">Perspective intérieure</strong></figcaption>
+              <figure class="project-media photo-card" data-x="-58" data-y="-38" data-rotate="-2">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.interior.1" src="./assets/projects/veranda/veranda-interior.webp" alt="Perspective intérieure de la véranda" width="1600" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.interior.1" data-media-target="number">03</span><strong data-media="veranda.interior.1" data-media-target="label">Perspective intérieure</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-46" data-y="-47" data-rotate="10">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.plan" src="./assets/projects/veranda/veranda-plan.webp" alt="Plan et élévations de la véranda" width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.plan" data-media-target="number">04</span><strong data-media="veranda.plan" data-media-target="label">Plan & élévations</strong></figcaption>
+              <figure class="project-media photo-card" data-x="-38" data-y="-40" data-rotate="10">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.plan.1" src="./assets/projects/veranda/veranda-plan.webp" alt="Plan et élévations de la véranda" width="1600" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.plan.1" data-media-target="number">04</span><strong data-media="veranda.plan.1" data-media-target="label">Plan & élévations</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-50" data-y="-52" data-rotate="1">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.garden" src="./assets/projects/veranda/veranda-garden.webp" alt="Étude du jardin et de la relation au paysage" width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.garden" data-media-target="number">05</span><strong data-media="veranda.garden" data-media-target="label">Continuité avec le jardin</strong></figcaption>
+              <figure class="project-media photo-card" data-x="-50" data-y="-50" data-rotate="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.garden.1" src="./assets/projects/veranda/veranda-garden.webp" alt="Étude du jardin et de la relation au paysage" width="1600" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="veranda.garden.1" data-media-target="number">05</span><strong data-media="veranda.garden.1" data-media-target="label">Continuité avec le jardin</strong></figcaption>
               </figure>
             </div>
             <div class="panel-copy panel-copy--veranda">
@@ -237,19 +254,27 @@
             <div class="panel-foot"><span data-field="veranda.footerTag1">Dessin à la main</span><span data-field="veranda.footerTag2">Plan & élévations</span><span data-field="veranda.footerTag3">Matières naturelles</span></div>
           </article>
 
-          <article class="project-panel project-panel--cave" id="cave">
+          <article class="project-panel project-panel--cave" id="cave" data-stage-panel="cave">
             <div class="cave-gallery" data-field="cave.galleryAriaLabel" data-field-target="aria-label" aria-label="Vues du projet Cave">
-              <figure class="project-media cave-image cave-image--main">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 86vw, 100vw"><source type="image/webp" sizes="(min-width: 900px) 86vw, 100vw"><img data-media="cave.main" src="./assets/projects/cave/cave-lounge.webp" alt="Espace détente de la cave, pierre et mobilier brun" width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption"><span data-media="cave.main" data-media-target="number">01</span><strong data-media="cave.main" data-media-target="label">Salon · pierre & bois</strong></figcaption>
+              <figure class="project-media cave-image cave-image--main" data-stage="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 86vw, 100vw"><source type="image/webp" sizes="(min-width: 900px) 86vw, 100vw"><img data-media="cave.main.1" src="./assets/projects/cave/cave-lounge.webp" alt="Espace détente de la cave, pierre et mobilier brun" width="1600" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cave.main.1" data-media-target="number">01</span><strong data-media="cave.main.1" data-media-target="label">Salon · pierre & bois</strong></figcaption>
               </figure>
-              <figure class="project-media cave-image cave-image--detail">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 37vw, 44vw"><source type="image/webp" sizes="(min-width: 900px) 37vw, 44vw"><img data-media="cave.detail" src="./assets/projects/cave/cave-tasting.webp" alt="Comptoir de dégustation devant un mur en pierre" width="1400" height="900" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption"><span data-media="cave.detail" data-media-target="number">02</span><strong data-media="cave.detail" data-media-target="label">Comptoir de dégustation</strong></figcaption>
+              <figure class="project-media cave-image cave-image--detail" data-stage="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 37vw, 44vw"><source type="image/webp" sizes="(min-width: 900px) 37vw, 44vw"><img data-media="cave.detail.1" src="./assets/projects/cave/cave-tasting.webp" alt="Comptoir de dégustation devant un mur en pierre" width="1400" height="900" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cave.detail.1" data-media-target="number">02</span><strong data-media="cave.detail.1" data-media-target="label">Comptoir de dégustation</strong></figcaption>
               </figure>
-              <figure class="project-media cave-image cave-image--plan">
-                <picture><source type="image/avif" sizes="(min-width: 900px) 24vw, 32vw"><source type="image/webp" sizes="(min-width: 900px) 24vw, 32vw"><img data-media="cave.plan" src="./assets/projects/cave/cave-plan.webp" alt="Vue de dessus de l’aménagement de la cave" width="1200" height="1200" loading="lazy" decoding="async"></picture>
-                <figcaption class="media-caption media-caption--dark"><span data-media="cave.plan" data-media-target="number">03</span><strong data-media="cave.plan" data-media-target="label">Plan · circulation</strong></figcaption>
+              <figure class="project-media cave-image cave-image--plan" data-stage="1">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 24vw, 32vw"><source type="image/webp" sizes="(min-width: 900px) 24vw, 32vw"><img data-media="cave.plan.1" src="./assets/projects/cave/cave-plan.webp" alt="Vue de dessus de l’aménagement de la cave" width="1200" height="1200" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="cave.plan.1" data-media-target="number">03</span><strong data-media="cave.plan.1" data-media-target="label">Plan · circulation</strong></figcaption>
+              </figure>
+              <figure class="project-media cave-image cave-image--exhibition" data-stage="2">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 62vw, 100vw"><source type="image/webp" sizes="(min-width: 900px) 62vw, 100vw"><img data-media="cave.exhibition.2" src="./assets/projects/cave/cave-exhibition.webp" alt="Zone d’exposition de la cave" width="1600" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption"><span data-media="cave.exhibition.2" data-media-target="number">01</span><strong data-media="cave.exhibition.2" data-media-target="label">Zone d’exposition</strong></figcaption>
+              </figure>
+              <figure class="project-media cave-image cave-image--overview" data-stage="2">
+                <picture><source type="image/avif" sizes="(min-width: 900px) 28vw, 40vw"><source type="image/webp" sizes="(min-width: 900px) 28vw, 40vw"><img data-media="cave.overview.2" src="./assets/projects/cave/cave-overview.webp" alt="Vue de dessus de la cave" width="1200" height="1000" loading="lazy" decoding="async"></picture>
+                <figcaption class="media-caption media-caption--dark"><span data-media="cave.overview.2" data-media-target="number">02</span><strong data-media="cave.overview.2" data-media-target="label">Vue d’ensemble</strong></figcaption>
               </figure>
             </div>
             <div class="panel-copy panel-copy--cave panel-copy--light">

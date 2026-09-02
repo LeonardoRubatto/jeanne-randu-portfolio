@@ -1,7 +1,7 @@
 slug,order,title,type,image,alt,relatedImages
 ## identifiant,ordre dans le carrousel,titre du projet,catégorie · discipline,image,texte alternatif,images liées séparées par des points-virgules (optionnel — laisser vide pour l'instant)
-louboutin,1,Stand Louboutin,Retail · Scénographie,./assets/projects/archive/louboutin.webp,Stand Louboutin,
-residence,2,Résidence cinéma,Espace intergénérationnel,./assets/projects/archive/residence.webp,Résidence cinéma,
-chair,3,Chaise disco,Objet · Matière,./assets/projects/archive/chair.webp,Chaise disco,
+louboutin,1,Stand Louboutin,Retail · Scénographie,./assets/projects/archive/louboutin.webp,Stand Louboutin,./assets/projects/archive/louboutin-detail-1.webp;./assets/projects/archive/louboutin-detail-2.webp
+residence,2,Résidence cinéma,Espace intergénérationnel,./assets/projects/archive/residence.webp,Résidence cinéma,./assets/projects/archive/residence-detail-1.webp;./assets/projects/archive/residence-detail-2.webp
+chair,3,Chaise disco,Objet · Matière,./assets/projects/archive/chair.webp,Chaise disco,./assets/projects/archive/chair-detail-1.webp;./assets/projects/archive/chair-detail-2.webp
 equilibre,4,Équilibres,Recherches volumétriques,./assets/projects/archive/equilibre.webp,Équilibres,
 vitrine,5,Vitrine florale,Identité · Merchandising,./assets/projects/archive/vitrine.webp,Vitrine florale,

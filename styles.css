@@ -580,6 +580,14 @@ button {
   font-weight: 400;
 }
 
+.panel-copy h2 small {
+  font-family: var(--sans);
+  font-size: 0.22em;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  vertical-align: 0.36em;
+}
+
 .panel-description {
   width: min(100%, 440px);
   margin: 48px 0 0;
@@ -951,8 +959,37 @@ button {
   background: #f0e9df;
 }
 
+/* Stage 2 (see script.js's initStageCrossfade): a deliberately different
+   composition from main/detail/plan above, not a re-skin of the same
+   three shapes — anchored left instead of right, one accent top-right
+   instead of two along the bottom. */
+.cave-image--exhibition {
+  top: 0;
+  left: 0;
+  width: 64%;
+  height: 100%;
+}
+
+.cave-image--overview {
+  top: 6%;
+  right: 4%;
+  z-index: 3;
+  width: 30%;
+  height: 36%;
+  border: 8px solid #2b201d;
+}
+
 .panel-copy--cave {
   width: min(34vw, 480px);
+}
+
+/* Stage crossfade base state (script.js's initStageCrossfade sets the
+   actual opacity continuously as the user scrolls through the panel —
+   this is just the sensible starting point before that first runs, and
+   the no-JS fallback). */
+[data-stage="2"] {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Atmospheric depth gallery: one scene at a time, with surrounding studies. */
