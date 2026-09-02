@@ -23,7 +23,7 @@
 
   // --- Archive tier: full generation ---
   function archiveCard(project, index) {
-    return `<button class="depth-card" type="button" data-index="${index}" data-number="${esc(project.number)}" data-title="${esc(project.title)}" data-type="${esc(project.type)}" data-position="0" aria-pressed="${index === 0 ? "true" : "false"}">
+    return `<button class="depth-card" type="button" data-index="${index}" data-slug="${esc(project.slug)}" data-number="${esc(project.number)}" data-title="${esc(project.title)}" data-type="${esc(project.type)}" data-position="0" aria-pressed="${index === 0 ? "true" : "false"}">
       <figure><img src="${esc(project.image)}" alt="${esc(project.alt)}" width="1000" height="1200" loading="lazy"><figcaption class="media-caption"><span>${esc(project.number)}</span><strong>${esc(project.title)}</strong></figcaption></figure>
     </button>`;
   }

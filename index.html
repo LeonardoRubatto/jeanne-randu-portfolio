@@ -171,13 +171,7 @@
           <article class="project-panel project-panel--nike" id="nike">
             <div class="nike-grid" aria-hidden="true"></div>
             <div class="nike-canvas-wrap">
-              <div class="nike-patchwork" aria-hidden="true">
-                <img class="nike-patch nike-patch--one" src="./assets/projects/nike/nike-athlete.webp" alt="">
-                <img class="nike-patch nike-patch--two" src="./assets/projects/nike/nike-moodboard.webp" alt="">
-                <img class="nike-patch nike-patch--three" src="./assets/projects/nike/nike-social.webp" alt="">
-                <img class="nike-patch nike-patch--four" src="./assets/projects/nike/nike-poster.webp" alt="">
-                <img class="nike-patch nike-patch--five" id="nike-mosaic-source" src="./assets/projects/nike/nike-storefront.webp" alt="">
-              </div>
+              <img class="nike-mosaic-source" id="nike-mosaic-source" src="./assets/projects/nike/nike-storefront.webp" alt="" aria-hidden="true">
               <canvas class="nike-canvas" data-mosaic-source="nike-mosaic-source" role="img" data-field="nike.galleryAriaLabel" data-field-target="aria-label" aria-label="Activation sportive Nike implantée au centre-ville de Tours"></canvas>
             </div>
             <img class="nike-poster" data-media="nike.poster" src="./assets/projects/nike/nike-poster.webp" alt="Affiche Run Your Line de l’activation Nike" width="800" height="1200" loading="lazy">
@@ -304,8 +298,19 @@
       <div class="footer-bottom">
         <span>© 2026 Jeanne Randu</span>
         <a href="./mentions-legales.html">Mentions légales</a>
-        <a href="https://telaventis.fr" target="_blank" rel="noopener" class="footer-legal-link">Site by Telaventis</a>
       </div>
+      <a href="https://telaventis.fr" target="_blank" rel="noopener" class="footer-legal-link">Site by Telaventis</a>
     </footer>
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lightbox-title">
+      <button class="lightbox-close" type="button" aria-label="Fermer l’aperçu">✕</button>
+      <figure class="lightbox-figure">
+        <img id="lightbox-image" src="" alt="">
+        <figcaption>
+          <span id="lightbox-number"></span>
+          <strong id="lightbox-title"></strong>
+        </figcaption>
+      </figure>
+    </div>
   </body>
 </html>

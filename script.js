@@ -16,6 +16,12 @@
   const photoStack = document.querySelector(".photo-stack");
   let scrollFrame = 0;
 
+  // Same overall scroll-progress envelope as before (0.49-0.77) — only how
+  // it's divided among the cards changes, so this doesn't touch the cave
+  // panel's own reveal timing below.
+  const PHOTO_ARRIVAL_START = 0.49;
+  const PHOTO_ARRIVAL_END = 0.77;
+
   function placePhotoCard(card, progress) {
     const x = Number(card.dataset.x || -50);
     const y = Number(card.dataset.y || -50);
@@ -73,8 +79,16 @@
       panel.style.clipPath = `inset(0 ${(1 - reveal) * 100}% 0 0)`;
     });
 
+    // Each photo gets its own non-overlapping window: half of it is the
+    // fade/lift transition, the other half is a settled hold where the
+    // card sits still at full opacity — long enough to actually hover it
+    // — before the next one starts. Previously these windows overlapped
+    // by more than half, so two cards were mid-transition at once and
+    // neither ever settled.
+    const photoPeriod = (PHOTO_ARRIVAL_END - PHOTO_ARRIVAL_START) / Math.max(1, photoCards.length);
     photoCards.forEach((card, index) => {
-      const arrival = range(progress, 0.49 + index * 0.045, 0.59 + index * 0.045);
+      const start = PHOTO_ARRIVAL_START + index * photoPeriod;
+      const arrival = range(progress, start, start + photoPeriod * 0.5);
       placePhotoCard(card, arrival);
     });
   }
@@ -189,7 +203,7 @@
       }
 
       const tile = Math.max(18, Math.round(width / 36));
-      const radius = width * 0.26;
+      const radius = width * 0.15;
       const localPointerX = pointerX * dpr;
       const localPointerY = pointerY * dpr;
 
@@ -197,7 +211,10 @@
         for (let x = 0; x < width; x += tile) {
           const distance = Math.hypot(x + tile / 2 - localPointerX, y + tile / 2 - localPointerY);
           const influence = clamp(1 - distance / radius);
-          const scale = 0.08 + (1 - influence) * 0.88;
+          // scale reaches exactly 1 (fully solid, no gap) once a tile is
+          // outside the hover radius — the mosaic only dissolves right
+          // around the cursor, not as a faint grid over the whole image.
+          const scale = 0.1 + (1 - influence) * 0.9;
           const size = Math.max(1, (tile - 1.5 * dpr) * scale);
           const sx = sourceX + (x / width) * sourceWidth;
           const sy = sourceY + (y / height) * sourceHeight;
@@ -277,11 +294,85 @@
       if (archive) archive.dataset.mood = String(activeIndex);
     }
 
-    cards.forEach((card, index) => card.addEventListener("click", () => select(index)));
+    // Focus mode: a first click on any card is the existing carousel
+    // select() below, unchanged. A second click, specifically on the card
+    // that's already centered, leaves it exactly where it is and instead
+    // blurs the cards around it, scattering any relatedImages for that
+    // project (empty today for every project — see csv/archive.csv — so
+    // this currently just blurs the surroundings with nothing to scatter;
+    // it lights up automatically once a project has related images).
+    let focusActive = false;
+    let relatedContainer = null;
+
+    function clearRelatedImages() {
+      if (relatedContainer) {
+        relatedContainer.remove();
+        relatedContainer = null;
+      }
+    }
+
+    function renderRelatedImages(project) {
+      clearRelatedImages();
+      const images = project?.relatedImages || [];
+      if (!images.length) return;
+      const container = document.createElement("div");
+      container.className = "depth-related";
+      container.setAttribute("aria-hidden", "true");
+      images.forEach((src, index) => {
+        const angle = (index / images.length) * Math.PI * 2 - Math.PI / 2;
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = "";
+        img.loading = "lazy";
+        img.style.left = `${50 + Math.cos(angle) * 34}%`;
+        img.style.top = `${38 + Math.sin(angle) * 30}%`;
+        img.style.transitionDelay = `${index * 60}ms`;
+        container.appendChild(img);
+      });
+      gallery.appendChild(container);
+      relatedContainer = container;
+      window.requestAnimationFrame(() => container.classList.add("is-visible"));
+    }
+
+    function exitFocus() {
+      if (!focusActive) return;
+      focusActive = false;
+      gallery.classList.remove("is-focused");
+      clearRelatedImages();
+      startAutoplay();
+    }
+
+    function enterFocus() {
+      if (focusActive) return;
+      focusActive = true;
+      stopAutoplay();
+      gallery.classList.add("is-focused");
+      const data = window.SITE_ARCHIVE || [];
+      const activeCard = cards[activeIndex];
+      const project = data.find((item) => item.slug === activeCard?.dataset.slug) || data[activeIndex];
+      renderRelatedImages(project);
+    }
+
+    cards.forEach((card, index) => {
+      card.addEventListener("click", () => {
+        if (index === activeIndex) {
+          if (focusActive) exitFocus();
+          else enterFocus();
+          return;
+        }
+        if (focusActive) exitFocus();
+        select(index);
+      });
+    });
 
     gallery.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (focusActive) exitFocus();
+        return;
+      }
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
       event.preventDefault();
+      if (focusActive) exitFocus();
       select(activeIndex + (event.key === "ArrowRight" ? 1 : -1));
     });
 
@@ -307,10 +398,131 @@
       });
     }
 
+    // Slow auto-advance for the satellite cards — the centered card just
+    // ends up being whichever one is currently active, nothing here moves
+    // it directly. Pauses on hover/focus so it never fights a click, an
+    // arrow-key nav, or the pointermove float effect above; off entirely
+    // under reduced motion or a coarse (touch) pointer.
+    const AUTOPLAY_INTERVAL_MS = 5200;
+    let autoplayTimer = 0;
+
+    function stopAutoplay() {
+      window.clearInterval(autoplayTimer);
+      autoplayTimer = 0;
+    }
+
+    function startAutoplay() {
+      if (reducedMotion.matches || coarsePointer.matches || cards.length < 2) return;
+      stopAutoplay();
+      autoplayTimer = window.setInterval(() => select(activeIndex + 1), AUTOPLAY_INTERVAL_MS);
+    }
+
+    gallery.addEventListener("pointerenter", stopAutoplay);
+    gallery.addEventListener("pointerleave", startAutoplay);
+    gallery.addEventListener("focusin", stopAutoplay);
+    gallery.addEventListener("focusout", startAutoplay);
+    reducedMotion.addEventListener?.("change", startAutoplay);
+    coarsePointer.addEventListener?.("change", startAutoplay);
+
     select(0);
+    startAutoplay();
   }
 
   document.querySelectorAll("[data-depth-gallery]").forEach(initDepthGallery);
+
+  // Click-to-close-up: every project photo except backgrounds (the cabane
+  // backdrop, the prologue hero) and the archive carousel (which has its
+  // own second-click focus mode in initDepthGallery above) opens centered
+  // and larger, with the rest of the page dimmed/blurred behind it.
+  function initLightbox() {
+    const lightbox = document.getElementById("lightbox");
+    if (!lightbox) return;
+
+    const imageEl = document.getElementById("lightbox-image");
+    const numberEl = document.getElementById("lightbox-number");
+    const titleEl = document.getElementById("lightbox-title");
+    const closeButton = lightbox.querySelector(".lightbox-close");
+    let triggerEl = null;
+
+    const triggers = Array.from(
+      document.querySelectorAll(
+        [
+          ".project-panel--cabane .project-media",
+          ".project-panel--veranda .project-media",
+          ".project-panel--cave .project-media",
+          ".nike-poster",
+        ].join(", "),
+      ),
+    );
+
+    function open(el) {
+      const img = el.tagName === "IMG" ? el : el.querySelector("img");
+      if (!img) return;
+      triggerEl = el;
+      imageEl.src = img.currentSrc || img.src;
+      imageEl.alt = img.alt || "";
+      const number = el.querySelector(".media-caption span")?.textContent || "";
+      const label = el.querySelector(".media-caption strong")?.textContent || img.alt || "";
+      numberEl.textContent = number;
+      numberEl.hidden = !number;
+      titleEl.textContent = label;
+      titleEl.hidden = !label;
+      lightbox.classList.add("is-open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("lightbox-lock");
+      document.addEventListener("keydown", onKeydown);
+      closeButton.focus();
+    }
+
+    function close() {
+      lightbox.classList.remove("is-open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("lightbox-lock");
+      document.removeEventListener("keydown", onKeydown);
+      triggerEl?.focus();
+      triggerEl = null;
+    }
+
+    function onKeydown(event) {
+      if (event.key === "Escape") {
+        close();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = lightbox.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])');
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    triggers.forEach((el) => {
+      el.classList.add("is-closeupable");
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("role", "button");
+      const label = el.querySelector("strong")?.textContent || el.getAttribute("alt") || "l’image";
+      el.setAttribute("aria-label", `Agrandir : ${label}`);
+      el.addEventListener("click", () => open(el));
+      el.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        open(el);
+      });
+    });
+
+    closeButton.addEventListener("click", close);
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) close();
+    });
+  }
+
+  initLightbox();
 
   const proximityWord = document.querySelector("[data-proximity-word]");
   if (proximityWord && !reducedMotion.matches && !coarsePointer.matches) {
