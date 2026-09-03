@@ -234,24 +234,38 @@
             </div>
             <div class="panel-sticky">
             <div class="veranda-notation" aria-hidden="true">03 / CONTINUITÉ</div>
+            <!-- Positions are a 5-point pentagon around the container's center
+                 (72° apart), not a 4-corner + dead-center layout — a card
+                 sitting dead-center is geometrically closest to all 4 others
+                 at once, so it dominated every pointer/tap regardless of which
+                 photo was visually aimed at (confirmed both by pairwise
+                 bounding-box overlap math and by simulating
+                 document.elementFromPoint() at each card's own center: the old
+                 center card resolved EVERY other card's centerpoint to itself).
+                 These exact percentages were tuned the same way — scaling the
+                 pentagon's radius up and checking elementFromPoint() at each
+                 card's own center still resolves to that card, at both the
+                 desktop and mobile .photo-card sizes below, with no card
+                 clipping outside .panel-sticky's frame either. Re-verify the
+                 same way (not just visually) if these ever need to change. -->
             <div class="photo-stack" data-field="veranda.galleryAriaLabel" data-field-target="aria-label" aria-label="Étapes du projet Véranda">
-              <figure class="project-media photo-card" data-x="-68" data-y="-68" data-rotate="-9">
+              <figure class="project-media photo-card" data-x="-50" data-y="-113" data-rotate="-9">
                 <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.mood-exterior.1" src="./assets/projects/veranda/veranda-mood-exterior.webp" alt="Palette extérieure et jardin" width="1600" height="1000" loading="lazy" decoding="async"></picture>
                 <figcaption class="media-caption media-caption--dark"><span data-media="veranda.mood-exterior.1" data-media-target="number">01</span><strong data-media="veranda.mood-exterior.1" data-media-target="label">Palette extérieure & jardin</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-32" data-y="-68" data-rotate="5">
+              <figure class="project-media photo-card" data-x="-110" data-y="-70" data-rotate="5">
                 <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.exterior.1" src="./assets/projects/veranda/veranda-exterior.webp" alt="Perspective extérieure dessinée à la main" width="1600" height="1000" loading="lazy" decoding="async"></picture>
                 <figcaption class="media-caption media-caption--dark"><span data-media="veranda.exterior.1" data-media-target="number">02</span><strong data-media="veranda.exterior.1" data-media-target="label">Perspective extérieure</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-68" data-y="-32" data-rotate="-2">
+              <figure class="project-media photo-card" data-x="-86" data-y="0" data-rotate="-2">
                 <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.interior.1" src="./assets/projects/veranda/veranda-interior.webp" alt="Perspective intérieure de la véranda" width="1600" height="1000" loading="lazy" decoding="async"></picture>
                 <figcaption class="media-caption media-caption--dark"><span data-media="veranda.interior.1" data-media-target="number">03</span><strong data-media="veranda.interior.1" data-media-target="label">Perspective intérieure</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-32" data-y="-32" data-rotate="10">
+              <figure class="project-media photo-card" data-x="-14" data-y="0" data-rotate="10">
                 <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.plan.1" src="./assets/projects/veranda/veranda-plan.webp" alt="Plan et élévations de la véranda" width="1600" height="1000" loading="lazy" decoding="async"></picture>
                 <figcaption class="media-caption media-caption--dark"><span data-media="veranda.plan.1" data-media-target="number">04</span><strong data-media="veranda.plan.1" data-media-target="label">Plan & élévations</strong></figcaption>
               </figure>
-              <figure class="project-media photo-card" data-x="-50" data-y="-50" data-rotate="1">
+              <figure class="project-media photo-card" data-x="2" data-y="-70" data-rotate="1">
                 <picture><source type="image/avif" sizes="(min-width: 900px) 46vw, 76vw"><source type="image/webp" sizes="(min-width: 900px) 46vw, 76vw"><img data-media="veranda.garden.1" src="./assets/projects/veranda/veranda-garden.webp" alt="Étude du jardin et de la relation au paysage" width="1600" height="1000" loading="lazy" decoding="async"></picture>
                 <figcaption class="media-caption media-caption--dark"><span data-media="veranda.garden.1" data-media-target="number">05</span><strong data-media="veranda.garden.1" data-media-target="label">Continuité avec le jardin</strong></figcaption>
               </figure>

@@ -867,12 +867,18 @@ button {
   height: 70%;
 }
 
+/* Shrunk from 46vw/50vh — the data-x/data-y offsets translate() a card by
+   a percentage of its OWN size, so the wider pentagon spread (index.html,
+   see the comment above .photo-stack) needs a smaller card to still fit
+   inside .project-panel's frame without the outermost photos clipping
+   against its overflow:hidden edges. Verified via getBoundingClientRect()
+   at this exact size, not just eyeballed — see the index.html comment. */
 .photo-card {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(46vw, 700px);
-  height: min(50vh, 520px);
+  width: min(30vw, 380px);
+  height: min(35vh, 250px);
   padding: 12px;
   background: #fff;
   box-shadow: 0 20px 60px rgba(51, 42, 31, 0.12);
@@ -1925,11 +1931,30 @@ body.lightbox-lock {
     height: auto;
   }
 
+  /* Shrunk from 76vw/38vh — same reason as the desktop .photo-card rule:
+     room for the wider pentagon spread without clipping. Verified at
+     .panel-sticky's actual 100svh frame width, same technique as desktop
+     (see the index.html comment above .photo-stack) — mobile has much
+     less width to work with than desktop's pentagon, so this needed to
+     shrink further than the desktop cap did, proportionally.
+
+     No transition here (removed opacity/transform 600-700ms) — those are
+     exactly the two properties placePhotoCard() (script.js) writes as an
+     inline style on every single scroll-driven animation frame. With a
+     CSS transition also declared on them, EVERY frame's write restarted
+     a new 600-700ms transition toward that frame's (slightly different)
+     target, so the rendered value was perpetually chasing a target that
+     had already moved on again before the transition finished — it could
+     never actually catch up during continuous scrolling, only "settling"
+     well after the finger stopped. That's likely a real part of "nothing
+     is happening" on a real phone: chaseProgress() (script.js) already
+     does frame-accurate, time-based easing at the JS level now, so a
+     second, uncoordinated CSS-level easing on top of it was actively
+     counterproductive, not just redundant. */
   .photo-card {
-    width: 76vw;
-    height: 38vh;
+    width: min(43vw, 280px);
+    height: min(15vh, 160px);
     padding: 8px;
-    transition: opacity 600ms var(--ease), transform 700ms var(--ease);
   }
 
   .veranda-notation { display: none; }
