@@ -23,6 +23,50 @@
     return clamp((-driverRect.top - textHeight) / total);
   }
 
+  // Mobile touch-momentum delivers scroll position in uneven bursts — a
+  // fast flick can jump the raw scroll-derived progress most of the way
+  // across a whole crossfade/arrival window in a single native scroll
+  // event, which is what made cabane/nike/cave/véranda's photo waves go
+  // by almost at once even after widening their pin-hold length. Chasing
+  // the raw target with a time-based decay instead of snapping straight
+  // to it every frame smooths that out — same technique (and constants)
+  // as Telaventis's own reference implementation for this exact problem,
+  // assets/moka-lab.js's render(): a longer pin-hold fixes most of it at
+  // the source (more physical distance per flick), this catches the rest
+  // (the momentum jitter itself). `state` is any object to stash the
+  // running eased value on — a DOM element works fine, one per panel, so
+  // several independent chases (e.g. one per stage panel in a shared
+  // loop) don't collide; `key` namespaces the stashed property so more
+  // than one chase can live on the same element. Returns the eased value
+  // and whether it's still catching up (the caller should keep
+  // requesting frames while true, even with no new scroll events, or the
+  // catch-up itself would stall).
+  function chaseProgress(state, key, target, dt) {
+    const CHASE_TAU = 120; // ms to close ~63% of the remaining gap
+    // progress/ms — loose on purpose (a full 0-1 sweep still can't
+    // visually complete in under ~350ms), this is a safety net for the
+    // frame after a skipped one (main thread busy during native momentum
+    // scroll), not the main fix — that's the pin-hold length itself.
+    const CHASE_MAX_RATE = 1 / 350;
+    const prop = `_chase_${key}`;
+    const current = state[prop];
+    if (current == null) {
+      state[prop] = target;
+      return { value: target, settling: false };
+    }
+    const dtEff = dt || 16;
+    const k = 1 - Math.exp(-dtEff / CHASE_TAU);
+    const wanted = current + (target - current) * k;
+    const maxStep = CHASE_MAX_RATE * dtEff;
+    let delta = wanted - current;
+    if (delta > maxStep) delta = maxStep;
+    else if (delta < -maxStep) delta = -maxStep;
+    let value = current + delta;
+    if (Math.abs(target - value) < 0.0004) value = target;
+    state[prop] = value;
+    return { value, settling: value !== target };
+  }
+
   const prologue = document.querySelector(".prologue");
   const prologueImage = document.querySelector(".prologue-image-primary img");
   const prologueLayer = document.querySelector(".prologue-image-layer");
@@ -221,24 +265,35 @@
       photoCards.forEach((card) => placePhotoCard(card, 1));
     } else {
       let mobileStackFrame = 0;
+      let mobileStackLastT = 0;
 
-      function updateMobilePhotoStack() {
+      function updateMobilePhotoStack(dt) {
         mobileStackFrame = 0;
-        if (desktop.matches) return;
+        if (desktop.matches) return false;
         const rect = verandaPanel.getBoundingClientRect();
         const textHeight = verandaCopy?.offsetHeight || 0;
-        const progress = pinProgress(rect, textHeight, window.innerHeight);
+        const target = pinProgress(rect, textHeight, window.innerHeight);
+        const { value: progress, settling } = chaseProgress(verandaPanel, "photoStack", target, dt);
         const period = 1 / Math.max(1, photoCards.length);
         photoCards.forEach((card, index) => {
           const start = index * period;
           const arrival = range(progress, start, start + period * 0.6);
           placePhotoCard(card, arrival);
         });
+        return settling;
       }
 
+      // Keeps re-requesting frames on its own, not just in response to
+      // scroll/resize, while chaseProgress is still catching up — a
+      // fast flick can end well before the eased value has settled to
+      // where the raw scroll position actually landed.
       function requestMobilePhotoUpdate() {
         if (mobileStackFrame) return;
-        mobileStackFrame = window.requestAnimationFrame(updateMobilePhotoStack);
+        mobileStackFrame = window.requestAnimationFrame((t) => {
+          const dt = mobileStackLastT ? Math.min(200, Math.max(0, t - mobileStackLastT)) : 16;
+          mobileStackLastT = t;
+          if (updateMobilePhotoStack(dt)) requestMobilePhotoUpdate();
+        });
       }
 
       window.addEventListener("scroll", requestMobilePhotoUpdate, { passive: true });
@@ -260,6 +315,7 @@
       stagePanels.forEach((panel) => applyStageProgress(panel, 0));
     } else {
       let mobileStageFrame = 0;
+      let mobileStageLastT = 0;
 
       // Nike gets a later-starting window than the default — same reason
       // as STAGE_WINDOWS_DESKTOP above, more time on the first poster
@@ -267,21 +323,31 @@
       const STAGE_WINDOW_MOBILE_DEFAULT = [0.55, 0.85];
       const STAGE_WINDOWS_MOBILE = { nike: [0.68, 0.85] };
 
-      function updateMobileStages() {
+      function updateMobileStages(dt) {
         mobileStageFrame = 0;
-        if (desktop.matches) return;
+        if (desktop.matches) return false;
+        let anySettling = false;
         stagePanels.forEach((panel) => {
           const rect = panel.getBoundingClientRect();
           const textHeight = panel.querySelector(".panel-copy")?.offsetHeight || 0;
-          const raw = pinProgress(rect, textHeight, window.innerHeight);
+          const target = pinProgress(rect, textHeight, window.innerHeight);
+          const { value: raw, settling } = chaseProgress(panel, "stage", target, dt);
+          if (settling) anySettling = true;
           const w = STAGE_WINDOWS_MOBILE[panel.dataset.stagePanel] || STAGE_WINDOW_MOBILE_DEFAULT;
           applyStageProgress(panel, range(raw, w[0], w[1]));
         });
+        return anySettling;
       }
 
+      // Same "keep chasing after the gesture ends" reasoning as
+      // requestMobilePhotoUpdate above.
       function requestMobileStageUpdate() {
         if (mobileStageFrame) return;
-        mobileStageFrame = window.requestAnimationFrame(updateMobileStages);
+        mobileStageFrame = window.requestAnimationFrame((t) => {
+          const dt = mobileStageLastT ? Math.min(200, Math.max(0, t - mobileStageLastT)) : 16;
+          mobileStageLastT = t;
+          if (updateMobileStages(dt)) requestMobileStageUpdate();
+        });
       }
 
       window.addEventListener("scroll", requestMobileStageUpdate, { passive: true });
