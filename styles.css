@@ -1831,16 +1831,17 @@ body.lightbox-lock {
      ((0,2,0), a class + a pseudo-class) than a single class selector, so
      it was silently winning over every one of these min-height overrides
      the whole time regardless of what value was set here. */
-  /* Bumped 220 -> 340svh: pinProgress() (script.js) subtracts .panel-copy's
-     own height from this budget before mapping it to 0-1, which — now
-     that .panel-copy lives outside the pinned frame instead of inside it
-     — left comparatively little of the min-height actually available as
-     scroll "travel" for the stage-1/stage-2 crossfade (roughly 220svh
-     minus the text's ~66svh minus the 100svh viewport itself). One
-     ordinary swipe covered most of that leftover travel, so both waves
-     of photos went by almost at once. This roughly triples that leftover
-     travel instead of the min-height figure itself. */
-  .project-panel.project-panel--cabane { min-height: 340svh; }
+  /* Bumped 220 -> 340 -> 1904svh: pinProgress() (script.js) subtracts
+     .panel-copy's own height from this budget before mapping it to 0-1,
+     which — now that .panel-copy lives outside the pinned frame instead
+     of inside it — left comparatively little of the min-height actually
+     available as scroll "travel" for the stage-1/stage-2 crossfade
+     (roughly 220svh minus the text's ~66svh minus the 100svh viewport
+     itself). 340svh (a ~3.2x first pass at that leftover travel) still
+     wasn't enough — this is a ~10x pass on top of that, so the leftover
+     travel figure at that point (not this min-height number, and not the
+     original 220svh) is what's actually ~10x. */
+  .project-panel.project-panel--cabane { min-height: 1904svh; }
 
   .cabane-backdrop::after {
     background: linear-gradient(180deg, rgba(10, 13, 9, 0.92) 0%, rgba(10, 13, 9, 0.45) 48%, rgba(10, 13, 9, 0.78) 100%);
@@ -1866,11 +1867,11 @@ body.lightbox-lock {
   .cabane-media--plan { width: 40%; height: 34%; }
 
   /* Same reasoning as cabane above: this is the pin-phase budget only,
-     bumped for the same reason (190 -> 275svh) — nike's leftover travel
-     after subtracting text+viewport was the shortest of the three
-     (barely 25svh), so the crossfade fired almost the instant the frame
-     pinned. */
-  .project-panel.project-panel--nike { min-height: 275svh; }
+     bumped 190 -> 275 -> 1618svh — nike's leftover travel after
+     subtracting text+viewport was the shortest of the three, so it gets
+     the largest multiplier (~13x on top of the 275svh figure's leftover
+     travel, not on 275svh itself). */
+  .project-panel.project-panel--nike { min-height: 1618svh; }
 
   /* Same reasoning as .cabane-media-board above — the canvas now has the
      pinned frame to itself. */
@@ -1931,8 +1932,9 @@ body.lightbox-lock {
   .veranda-notation { display: none; }
 
   /* Same reasoning as cabane/nike above (pin-phase budget only, bumped
-     180 -> 250svh for the same one-swipe-too-fast reason). */
-  .project-panel.project-panel--cave { min-height: 250svh; }
+     180 -> 250 -> 1062svh, ~10x on top of the 250svh figure's leftover
+     travel). */
+  .project-panel.project-panel--cave { min-height: 1062svh; }
 
   /* Desktop's .panel-copy--cave sets width: min(34vw, 480px) — reset back
      to the base mobile .panel-copy's auto, same reason as véranda above. */
