@@ -1196,8 +1196,8 @@ button {
 .depth-related img {
   position: absolute;
   z-index: 1;
-  width: 148px;
-  height: 192px;
+  width: 172px;
+  height: 224px;
   object-fit: cover;
   border: 4px solid var(--paper-light);
   box-shadow: 0 12px 32px rgba(5, 7, 4, 0.35);
@@ -1474,6 +1474,49 @@ body.lightbox-lock {
   transform: scale(1.06);
 }
 
+/* Prev/next, only shown when the opened photo belongs to a gallery of more
+   than one (script.js's initLightbox groups by project panel, or — for the
+   archive's related images — by the focused project's relatedImages). */
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(245, 241, 233, 0.3);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--paper-light);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: border-color 200ms var(--ease), transform 200ms var(--ease), opacity 200ms var(--ease);
+}
+
+.lightbox-nav:hover,
+.lightbox-nav:focus-visible {
+  border-color: var(--paper-light);
+}
+
+.lightbox-nav--prev {
+  left: 16px;
+}
+
+.lightbox-nav--prev:hover,
+.lightbox-nav--prev:focus-visible {
+  transform: translateY(-50%) translateX(-3px);
+}
+
+.lightbox-nav--next {
+  right: 16px;
+}
+
+.lightbox-nav--next:hover,
+.lightbox-nav--next:focus-visible {
+  transform: translateY(-50%) translateX(3px);
+}
+
 .lightbox-figure {
   position: relative;
   display: flex;
@@ -1608,16 +1651,26 @@ body.lightbox-lock {
     font-size: 20px;
   }
 
-  /* Same rect as .prologue-image-primary/.prologue-image-layer below
-     (top:20%, width:88% from the right edge i.e. left:12%, height:57%)
-     so the white duplicate is clipped to exactly where the photo sits. */
+  /* Same polygon as .prologue-contrast-mask below (not a plain rect): it's
+     .prologue-image-primary's own diagonal clip-path (10% 0, 100% 0, 100%
+     100%, 0 88%) re-expressed in full-section percentages instead of that
+     element's own top:20%/width:88%/height:57% box. A plain rectangular
+     inset here used to leave a wedge — the top-left corner the photo's
+     diagonal edge cuts away — where this "white where there's a photo
+     behind it" window had no photo behind it, just the plain paper
+     background, so the white duplicate text read as white-on-white right
+     where the real (dark) heading crosses that corner. Matching the
+     photo's actual visible shape means the reveal window is white only
+     exactly where the photo really is, at any scroll position (the photo
+     pans/scales within this same fixed frame on scroll — see script.js —
+     the frame itself never moves). */
   .prologue-discipline-mask {
     display: block;
     position: absolute;
     z-index: 5;
     inset: 0;
     overflow: hidden;
-    clip-path: inset(20% 0 23% 12%);
+    clip-path: polygon(20.8% 20%, 100% 20%, 100% 77%, 12% 70.16%);
     pointer-events: none;
   }
 
@@ -1727,10 +1780,25 @@ body.lightbox-lock {
     transform: translateY(0);
   }
 
+  /* Text first, photos after: on mobile .panel-copy is no longer absolute
+     (overlaid on the pinned photo frame, which is what was colliding —
+     the description's actual height varies with its content/the device's
+     text size, so a fixed top-percentage split between it and the media
+     board was never reliable), it's a normal-flow block, now a direct
+     child of .project-panel BEFORE .panel-sticky in index.html (not
+     nested inside it) — so it just takes whatever height its own content
+     needs, in the driver's normal scroll flow, ABOVE the pinned 100svh
+     photo frame that follows it. Scrolling past it behaves like ordinary
+     content; only once it's scrolled by does .panel-sticky's own pin
+     engage — "prima il testo, poi scendi giù e ci sono le immagini".
+     script.js's mobile scroll-progress formulas read this block's own
+     height (offsetHeight) to keep the photo/stage choreography timed to
+     the pin phase specifically, not skewed by however tall the text
+     turns out to be on a given phone. */
   .panel-copy {
-    top: 72px;
-    left: 16px;
-    width: calc(100% - 32px);
+    position: static;
+    width: auto;
+    padding: 96px 16px 40px;
   }
 
   .panel-number { margin-bottom: 24px; }
@@ -1752,10 +1820,12 @@ body.lightbox-lock {
 
   .panel-foot span:nth-child(3) { display: none; }
 
-  /* Taller than before (was 142svh) with the media board pushed further
-     down (was top:47%) — the description paragraph is long enough that
-     it was running into the board's top edge; this gives it clear room
-     regardless of exactly how many lines it wraps to on a given phone. */
+  /* This min-height is the pin-phase budget only — how long the photo
+     frame holds/cycles once it engages — not the whole section length
+     any more: .panel-copy above now adds its own (unconstrained) normal-
+     flow height on top of this, so the driver ends up taller still, same
+     idea as before just no longer needing to also make room for text
+     inside this budget. */
   /* Written as .project-panel.project-panel--X (not just .project-panel--X)
      to match — .project-panel:nth-child(n) above has higher specificity
      ((0,2,0), a class + a pseudo-class) than a single class selector, so
@@ -1767,12 +1837,18 @@ body.lightbox-lock {
     background: linear-gradient(180deg, rgba(10, 13, 9, 0.92) 0%, rgba(10, 13, 9, 0.45) 48%, rgba(10, 13, 9, 0.78) 100%);
   }
 
+  /* Now the only thing in the pinned frame (the text moved out, above
+     it), so it can use nearly the whole 100svh frame instead of the
+     bottom sliver it used to be squeezed into — top/bottom margins just
+     keep it off the very top edge and clear of .panel-foot at the
+     bottom. */
   .cabane-media-board {
-    top: 60%;
+    top: 6%;
     right: 16px;
+    bottom: 12%;
     left: 16px;
     width: auto;
-    height: 37%;
+    height: auto;
   }
 
   .cabane-media--exterior { width: 58%; height: 54%; }
@@ -1780,48 +1856,53 @@ body.lightbox-lock {
   .cabane-media--bedroom { width: 42%; height: 38%; }
   .cabane-media--plan { width: 40%; height: 34%; }
 
-  /* Same reasoning as cabane above — more height, media pushed down, so
-     the description text has clear room above it. */
+  /* Same reasoning as cabane above: this is the pin-phase budget only. */
   .project-panel.project-panel--nike { min-height: 190svh; }
 
+  /* Same reasoning as .cabane-media-board above — the canvas now has the
+     pinned frame to itself. */
   .nike-canvas-wrap {
-    top: 52%;
+    top: 6%;
+    bottom: 12%;
     width: 100%;
-    height: 45%;
+    height: auto;
   }
 
   .nike-canvas-wrap::after {
     background: linear-gradient(180deg, #0d0e0c 0%, transparent 32%);
   }
 
-  .nike-poster { right: 6%; bottom: 7%; width: 32%; }
-  .nike-lines { top: 32%; width: 90%; }
+  .nike-poster { right: 6%; bottom: 14%; width: 36%; }
+  .nike-lines { top: 20%; width: 90%; }
 
   /* Tall on purpose: the photo-stack's scroll-driven reveal (script.js)
-     computes its progress from how far this panel has actually scrolled
-     through the viewport, so giving it 3x+ the room is what makes each
-     photo linger — a taller min-height, not a tweak to the JS formula
-     (which would just mean the last photos never fully arrive). */
+     computes its progress from how far the pinned frame has been held
+     (see the offset formulas near updateMobilePhotoStack/updateMobile
+     Stages), so giving it 3x+ the room is what makes each photo linger —
+     a taller min-height, not a tweak to the JS formula (which would just
+     mean the last photos never fully arrive). Pin-phase budget only, same
+     as cabane/nike/cave above — .panel-copy--veranda's own height is on
+     top of this, no longer sticky (see below). */
   .project-panel.project-panel--veranda { min-height: 480svh; }
 
-  /* Sticky, not absolute: the title/intro stay in view for as long as
-     the (very tall) panel is being scrolled through, i.e. until the
-     photo sequence below has fully played out — then it releases
-     naturally once the panel itself scrolls past, moving on to cave. */
+  /* No longer position: sticky — that was a workaround for the title
+     living inside the same pinned frame as the photos and needing to
+     survive a hold it wasn't really part of; now it's normal-flow above
+     that frame (like every other panel's .panel-copy), so it just scrolls
+     by normally once read, and the pinned frame below is the photos'
+     alone. Still need to reset the desktop rule's width — min(36vw,520px)
+     — back to the base mobile .panel-copy's auto, or it'd stay a ~140px
+     sliver at phone widths. */
   .panel-copy--veranda {
-    position: sticky;
-    top: 64px;
+    width: auto;
   }
 
   .photo-stack {
-    top: 14%;
+    top: 6%;
     right: 0;
+    bottom: 10%;
     width: 100%;
-    /* Ends well short of the panel's own bottom edge (66% + 14% top =
-       80%) so there's a real settled hold after the last photo arrives —
-       the véranda background stays in view until then — before scrolling
-       far enough to actually leave the panel for cave. */
-    height: 66%;
+    height: auto;
   }
 
   .photo-card {
@@ -1833,9 +1914,18 @@ body.lightbox-lock {
 
   .veranda-notation { display: none; }
 
-  /* Same reasoning as cabane/nike above. */
+  /* Same reasoning as cabane/nike above (pin-phase budget only). */
   .project-panel.project-panel--cave { min-height: 180svh; }
-  .cave-gallery { inset: 52% 0 0 0; }
+
+  /* Desktop's .panel-copy--cave sets width: min(34vw, 480px) — reset back
+     to the base mobile .panel-copy's auto, same reason as véranda above. */
+  .panel-copy--cave {
+    width: auto;
+  }
+
+  /* Same reasoning as .cabane-media-board above — the gallery has the
+     pinned frame to itself now. */
+  .cave-gallery { inset: 6% 0 12% 0; }
 
   .cave-gallery::after {
     background: linear-gradient(180deg, #2b201d 0%, transparent 24%);
@@ -1936,6 +2026,15 @@ body.lightbox-lock {
     top: 12px;
     right: 12px;
   }
+
+  .lightbox-nav {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+
+  .lightbox-nav--prev { left: 4px; }
+  .lightbox-nav--next { right: 4px; }
 
   .lightbox-figure img {
     max-height: 68vh;

@@ -7,6 +7,22 @@
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
   const range = (value, start, end) => clamp((value - start) / (end - start));
 
+  // Mobile pin-phase progress: 0 the moment .panel-sticky's hold engages,
+  // 1 as it's about to release into the next panel. driverRect is the
+  // outer scroll driver's own rect (.project-panel — a descendant's rect
+  // stops changing once its pin engages, which would freeze this). Panels
+  // now carry a normal-flow .panel-copy block BEFORE the pinned frame
+  // (index.html), so its own height has to come off both the numerator
+  // and denominator here — otherwise the text's height (which varies with
+  // its content and the device's text size) would eat into what's meant
+  // to be pure pin-hold progress, and every hand-tuned crossfade/arrival
+  // window below would fire later than intended, or on some phones not
+  // reach 1 (release) at all before the driver runs out of height.
+  function pinProgress(driverRect, textHeight, viewportHeight) {
+    const total = Math.max(1, driverRect.height - textHeight - viewportHeight);
+    return clamp((-driverRect.top - textHeight) / total);
+  }
+
   const prologue = document.querySelector(".prologue");
   const prologueImage = document.querySelector(".prologue-image-primary img");
   const prologueLayer = document.querySelector(".prologue-image-layer");
@@ -198,6 +214,8 @@
   // .photo-stack is inside the pinned frame, so once pinning engages its
   // own rect stops changing (it's visually frozen), which would freeze
   // this progress calculation too.
+  const verandaCopy = verandaPanel?.querySelector(".panel-copy");
+
   if (photoStack && verandaPanel) {
     if (reducedMotion.matches) {
       photoCards.forEach((card) => placePhotoCard(card, 1));
@@ -208,9 +226,8 @@
         mobileStackFrame = 0;
         if (desktop.matches) return;
         const rect = verandaPanel.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const total = Math.max(1, rect.height - viewportHeight);
-        const progress = clamp(-rect.top / total);
+        const textHeight = verandaCopy?.offsetHeight || 0;
+        const progress = pinProgress(rect, textHeight, window.innerHeight);
         const period = 1 / Math.max(1, photoCards.length);
         photoCards.forEach((card, index) => {
           const start = index * period;
@@ -255,9 +272,8 @@
         if (desktop.matches) return;
         stagePanels.forEach((panel) => {
           const rect = panel.getBoundingClientRect();
-          const viewportHeight = window.innerHeight;
-          const total = Math.max(1, rect.height - viewportHeight);
-          const raw = clamp(-rect.top / total);
+          const textHeight = panel.querySelector(".panel-copy")?.offsetHeight || 0;
+          const raw = pinProgress(rect, textHeight, window.innerHeight);
           const w = STAGE_WINDOWS_MOBILE[panel.dataset.stagePanel] || STAGE_WINDOW_MOBILE_DEFAULT;
           applyStageProgress(panel, range(raw, w[0], w[1]));
         });
@@ -493,8 +509,8 @@
       // off the edge — .depth-gallery clips overflow, so anything placed
       // outside its bounds was getting cut off rather than just spilling
       // past the section.
-      const IMG_W = 148;
-      const IMG_H = 192;
+      const IMG_W = 172;
+      const IMG_H = 224;
       const MARGIN = 12;
       const galleryRect = gallery.getBoundingClientRect();
       const centerX = galleryRect.width / 2;
@@ -653,7 +669,15 @@
     const numberEl = document.getElementById("lightbox-number");
     const titleEl = document.getElementById("lightbox-title");
     const closeButton = lightbox.querySelector(".lightbox-close");
+    const prevButton = lightbox.querySelector(".lightbox-nav--prev");
+    const nextButton = lightbox.querySelector(".lightbox-nav--next");
     let triggerEl = null;
+    // The photo currently open, plus its siblings (same project) when
+    // there are any — lets prev/next browse sideways through that
+    // project's other photos without leaving the lightbox. A single photo
+    // (group.length === 1) just hides the arrows.
+    let group = [];
+    let groupIndex = 0;
 
     const triggers = Array.from(
       document.querySelectorAll(
@@ -666,18 +690,89 @@
       ),
     );
 
-    function open(el) {
+    function descriptorFromEl(el) {
       const img = el.tagName === "IMG" ? el : el.querySelector("img");
-      if (!img) return;
+      if (!img) return null;
+      const number = el.querySelector?.(".media-caption span")?.textContent || "";
+      const label = el.querySelector?.(".media-caption strong")?.textContent || img.alt || "";
+      return { src: img.currentSrc || img.src, alt: img.alt || "", number, label };
+    }
+
+    // Prologue/backdrop images and the archive's own coverflow cards
+    // aren't lightbox triggers (see the comment above this function), so
+    // el.closest() here only ever matches one of the two group kinds
+    // below, or neither (a single-photo group).
+    function groupFor(el) {
+      const panel = el.closest?.(".project-panel");
+      if (panel) {
+        const members = Array.from(panel.querySelectorAll(".project-media, .nike-poster"))
+          .map(descriptorFromEl)
+          .filter(Boolean);
+        if (members.length > 1) return members;
+      }
+
+      // Archive related images: siblings are the focused project's own
+      // relatedImages (desktop-only — mobile never renders/focuses this
+      // group, see initDepthGallery's click handler).
+      if (desktop.matches && el.closest?.(".depth-related")) {
+        const gallery = el.closest(".depth-gallery");
+        const activeCard = gallery?.querySelector('.depth-card[aria-pressed="true"]');
+        const data = window.SITE_ARCHIVE || [];
+        const project = data.find((item) => item.slug === activeCard?.dataset.slug);
+        const images = project?.relatedImages || [];
+        if (images.length > 1) {
+          return images.map((src, index) => ({
+            // Resolved to an absolute URL (new URL(...).href), matching
+            // what descriptorFromEl reads off a live <img> via
+            // currentSrc/src below — relatedImages comes straight from
+            // csv/archive.csv as a relative "./assets/..." string, which
+            // wouldn't string-match the browser-resolved src open() uses
+            // to find the clicked photo's starting index in this group.
+            src: new URL(src, document.baseURI).href,
+            alt: `Autre vue du projet ${project.title || ""}`.trim(),
+            number: String(index + 1).padStart(2, "0"),
+            label: project.title || "",
+          }));
+        }
+      }
+
+      return null;
+    }
+
+    function renderCurrent() {
+      const item = group[groupIndex];
+      if (!item) return;
+      imageEl.src = item.src;
+      imageEl.alt = item.alt || "";
+      numberEl.textContent = item.number || "";
+      numberEl.hidden = !item.number;
+      titleEl.textContent = item.label || "";
+      titleEl.hidden = !item.label;
+      const hasGroup = group.length > 1;
+      prevButton.hidden = !hasGroup;
+      nextButton.hidden = !hasGroup;
+    }
+
+    function step(delta) {
+      if (group.length < 2) return;
+      groupIndex = (groupIndex + delta + group.length) % group.length;
+      renderCurrent();
+    }
+
+    function open(el) {
+      const own = descriptorFromEl(el);
+      if (!own) return;
       triggerEl = el;
-      imageEl.src = img.currentSrc || img.src;
-      imageEl.alt = img.alt || "";
-      const number = el.querySelector(".media-caption span")?.textContent || "";
-      const label = el.querySelector(".media-caption strong")?.textContent || img.alt || "";
-      numberEl.textContent = number;
-      numberEl.hidden = !number;
-      titleEl.textContent = label;
-      titleEl.hidden = !label;
+      const siblings = groupFor(el);
+      if (siblings) {
+        group = siblings;
+        const matchIndex = siblings.findIndex((item) => item.src === own.src);
+        groupIndex = matchIndex >= 0 ? matchIndex : 0;
+      } else {
+        group = [own];
+        groupIndex = 0;
+      }
+      renderCurrent();
       lightbox.classList.add("is-open");
       lightbox.setAttribute("aria-hidden", "false");
       document.body.classList.add("lightbox-lock");
@@ -692,6 +787,7 @@
       document.removeEventListener("keydown", onKeydown);
       triggerEl?.focus();
       triggerEl = null;
+      group = [];
     }
 
     function onKeydown(event) {
@@ -699,8 +795,18 @@
         close();
         return;
       }
+      if (event.key === "ArrowLeft") {
+        step(-1);
+        return;
+      }
+      if (event.key === "ArrowRight") {
+        step(1);
+        return;
+      }
       if (event.key !== "Tab") return;
-      const focusable = lightbox.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])');
+      const focusable = Array.from(lightbox.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])')).filter(
+        (el) => !el.hidden,
+      );
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -728,6 +834,8 @@
     });
 
     closeButton.addEventListener("click", close);
+    prevButton.addEventListener("click", () => step(-1));
+    nextButton.addEventListener("click", () => step(1));
     lightbox.addEventListener("click", (event) => {
       if (event.target === lightbox) close();
     });
