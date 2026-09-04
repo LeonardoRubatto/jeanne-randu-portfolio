@@ -1415,7 +1415,8 @@ button {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.6;
+  color: #fff;
+  opacity: 1;
 }
 
 .footer-bottom a,
