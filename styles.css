@@ -234,7 +234,7 @@ button {
   top: 104px;
   left: 32px;
   margin: 0;
-  font-size: 15px;
+  font-size: 20px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -242,12 +242,12 @@ button {
 .prologue-discipline {
   position: absolute;
   z-index: 4;
-  top: 140px;
+  top: 144px;
   left: 32px;
   max-width: 260px;
   margin: 0;
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 400;
   line-height: 1.12;
 }
@@ -317,10 +317,10 @@ button {
 }
 
 .prologue-axis--matter {
-  top: 39%;
+  top: max(39%, 280px);
   left: 7%;
   color: transparent;
-  font-size: clamp(72px, 10vw, 160px);
+  font-size: clamp(64px, min(10vw, 15vh), 160px);
   font-variation-settings: "wght" 640;
   letter-spacing: -0.07em;
   -webkit-text-stroke: 1px var(--ink);
@@ -331,7 +331,7 @@ button {
   bottom: max(11%, 200px);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: clamp(80px, 13vw, 200px);
+  font-size: clamp(80px, min(13vw, 26vh), 200px);
   font-style: italic;
   letter-spacing: -0.07em;
 }
@@ -387,8 +387,8 @@ button {
 .prologue-manifesto p {
   margin: 0;
   font-family: var(--serif);
-  font-size: clamp(20px, 2.4vw, 36px);
-  line-height: 1.16;
+  font-size: clamp(17px, min(2.2vw, 3.4vh), 32px);
+  line-height: 1.18;
 }
 
 .section-heading {
@@ -1645,7 +1645,7 @@ body.lightbox-lock {
 
   .prologue-rule--one { left: 20%; }
   .prologue-rule--two { bottom: 24%; }
-  .prologue-kicker { top: 80px; left: 16px; font-size: 13px; }
+  .prologue-kicker { top: 80px; left: 16px; font-size: 16px; }
 
   .prologue-discipline {
     top: 104px;
