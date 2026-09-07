@@ -328,7 +328,7 @@ button {
 
 .prologue-axis--light {
   right: 5%;
-  bottom: 11%;
+  bottom: max(11%, 200px);
   color: var(--ink);
   font-family: var(--serif);
   font-size: clamp(80px, 13vw, 200px);
