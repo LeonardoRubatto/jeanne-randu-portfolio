@@ -234,7 +234,7 @@ button {
   top: 104px;
   left: 32px;
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -242,12 +242,12 @@ button {
 .prologue-discipline {
   position: absolute;
   z-index: 4;
-  top: 132px;
+  top: 140px;
   left: 32px;
   max-width: 260px;
   margin: 0;
   font-family: var(--serif);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 400;
   line-height: 1.12;
 }
@@ -320,7 +320,7 @@ button {
   top: 39%;
   left: 7%;
   color: transparent;
-  font-size: clamp(72px, 10vw, 140px);
+  font-size: clamp(72px, 10vw, 160px);
   font-variation-settings: "wght" 640;
   letter-spacing: -0.07em;
   -webkit-text-stroke: 1px var(--ink);
@@ -328,10 +328,10 @@ button {
 
 .prologue-axis--light {
   right: 5%;
-  bottom: max(11%, 260px);
+  bottom: max(11%, 200px);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: clamp(80px, 13vw, 170px);
+  font-size: clamp(80px, 13vw, 200px);
   font-style: italic;
   letter-spacing: -0.07em;
 }
@@ -371,7 +371,7 @@ button {
   bottom: 40px;
   left: 32px;
   display: grid;
-  width: min(52%, 660px);
+  width: min(58%, 760px);
   grid-template-columns: 120px 1fr;
   gap: 32px;
   align-items: start;
@@ -387,8 +387,8 @@ button {
 .prologue-manifesto p {
   margin: 0;
   font-family: var(--serif);
-  font-size: clamp(17px, 1.8vw, 27px);
-  line-height: 1.2;
+  font-size: clamp(20px, 2.4vw, 36px);
+  line-height: 1.16;
 }
 
 .section-heading {
