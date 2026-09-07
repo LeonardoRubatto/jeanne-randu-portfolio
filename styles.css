@@ -234,7 +234,7 @@ button {
   top: 104px;
   left: 32px;
   margin: 0;
-  font-size: 12px;
+  font-size: 15px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -242,7 +242,7 @@ button {
 .prologue-discipline {
   position: absolute;
   z-index: 4;
-  top: 152px;
+  top: 140px;
   left: 32px;
   max-width: 260px;
   margin: 0;
@@ -328,7 +328,7 @@ button {
 
 .prologue-axis--light {
   right: 5%;
-  bottom: 11%;
+  bottom: max(11%, 200px);
   color: var(--ink);
   font-family: var(--serif);
   font-size: clamp(80px, 13vw, 200px);
@@ -726,7 +726,6 @@ button {
   width: 57%;
   height: 56%;
   padding: 8px;
-  transform: rotate(-2deg);
 }
 
 .cabane-media--exterior img,
@@ -741,7 +740,6 @@ button {
   right: 0;
   width: 42%;
   height: 42%;
-  transform: rotate(1.5deg);
 }
 
 .cabane-media--bedroom {
@@ -750,7 +748,6 @@ button {
   bottom: 2%;
   width: 43%;
   height: 39%;
-  transform: rotate(-1deg);
 }
 
 .cabane-media--plan {
@@ -760,7 +757,6 @@ button {
   width: 38%;
   height: 34%;
   padding: 8px;
-  transform: rotate(2deg);
 }
 
 /* Nike: the canvas is a removable tiled veil over a project patchwork. */
@@ -1649,10 +1645,10 @@ body.lightbox-lock {
 
   .prologue-rule--one { left: 20%; }
   .prologue-rule--two { bottom: 24%; }
-  .prologue-kicker { top: 80px; left: 16px; }
+  .prologue-kicker { top: 80px; left: 16px; font-size: 13px; }
 
   .prologue-discipline {
-    top: 112px;
+    top: 104px;
     left: 16px;
     max-width: 220px;
     font-size: 20px;
@@ -1693,8 +1689,8 @@ body.lightbox-lock {
     height: 57%;
   }
 
-  .prologue-axis--matter { top: 40%; left: 1%; font-size: 19vw; }
-  .prologue-axis--light { right: 4%; bottom: 20%; font-size: 25vw; }
+  .prologue-axis--matter { top: 40%; left: 1%; font-size: clamp(64px, 19vw, 88px); }
+  .prologue-axis--light { right: 4%; bottom: 20%; font-size: clamp(84px, 25vw, 116px); }
   .prologue-axis--use { right: 12px; top: 38%; }
 
   .prologue-contrast-mask {
