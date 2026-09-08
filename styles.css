@@ -328,10 +328,10 @@ button {
 
 .prologue-axis--light {
   right: 5%;
-  bottom: max(11%, 200px);
+  bottom: 11%;
   color: var(--ink);
   font-family: var(--serif);
-  font-size: clamp(80px, min(13vw, 26vh), 200px);
+  font-size: clamp(80px, 13vw, 200px);
   font-style: italic;
   letter-spacing: -0.07em;
 }
@@ -384,11 +384,27 @@ button {
   text-transform: uppercase;
 }
 
-.prologue-manifesto p {
+.manifesto-copy {
+  grid-column: 2;
+  grid-row: 1;
   margin: 0;
   font-family: var(--serif);
   font-size: clamp(17px, min(2.2vw, 3.4vh), 32px);
   line-height: 1.18;
+}
+
+/* "lumière" (the giant axis word above) is free to swing wide on short
+   viewports and can end up crossing this paragraph — rather than fight
+   that with ever-more-defensive sizing, this white duplicate (script.js:
+   updatePrologueManifestoMask()) is clipped, on load/resize, to exactly
+   the rectangle where the two currently overlap, so that sliver reads
+   white-on-photo the same way the axis words themselves do wherever they
+   cross the photo. Hidden (inset 100% all round) whenever there's no
+   overlap to reveal. */
+.manifesto-copy--echo {
+  color: var(--paper-light);
+  pointer-events: none;
+  clip-path: inset(100% 100% 100% 100%);
 }
 
 .section-heading {
@@ -1872,6 +1888,14 @@ body.lightbox-lock {
   .cabane-media--interior { width: 40%; height: 42%; }
   .cabane-media--bedroom { width: 42%; height: 38%; }
   .cabane-media--plan { width: 40%; height: 34%; }
+
+  /* On mobile this card's box is much more portrait than the (landscape)
+     render it holds, so the desktop rule's object-fit: contain left huge
+     empty cream margins above/below the image instead of a thin matting
+     border. Cover it here instead — same crop behaviour as the interior/
+     bedroom photos already use — so the card reads as a photo, not mostly
+     empty paper. */
+  .cabane-media--exterior img { object-fit: cover; }
 
   /* Same reasoning/history as cabane above: 190 -> 275 -> 1618 -> 320svh.
      Same Moka-reference course-correction: a more modest ~1.4x bump over
