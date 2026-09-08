@@ -385,26 +385,10 @@ button {
 }
 
 .manifesto-copy {
-  grid-column: 2;
-  grid-row: 1;
   margin: 0;
   font-family: var(--serif);
   font-size: clamp(17px, min(2.2vw, 3.4vh), 32px);
   line-height: 1.18;
-}
-
-/* "lumière" (the giant axis word above) is free to swing wide on short
-   viewports and can end up crossing this paragraph — rather than fight
-   that with ever-more-defensive sizing, this white duplicate (script.js:
-   updatePrologueManifestoMask()) is clipped, on load/resize, to exactly
-   the rectangle where the two currently overlap, so that sliver reads
-   white-on-photo the same way the axis words themselves do wherever they
-   cross the photo. Hidden (inset 100% all round) whenever there's no
-   overlap to reveal. */
-.manifesto-copy--echo {
-  color: var(--paper-light);
-  pointer-events: none;
-  clip-path: inset(100% 100% 100% 100%);
 }
 
 .section-heading {
