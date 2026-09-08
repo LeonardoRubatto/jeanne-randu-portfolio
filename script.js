@@ -911,6 +911,45 @@
 
   initLightbox();
 
+  // Prologue: "lumière" is sized/positioned to sit big over the photo
+  // (styles.css .prologue-axis--light) and, on short viewports, that can
+  // bring it down far enough to cross the manifesto paragraph below it.
+  // Rather than keep shrinking/repositioning the word to dodge that (it
+  // needs room to breathe against the photo), the paragraph gets a white
+  // duplicate (.manifesto-copy--echo, index.html) clipped to exactly
+  // wherever the two currently overlap, so that sliver reads white the
+  // same way the axis words do wherever they cross the photo. Both
+  // elements' geometry depends on clamp()/vw/vh sizing, so this has to be
+  // measured and reclipped on load/resize rather than hand-tuned once.
+  function updatePrologueManifestoMask() {
+    const light = document.querySelector(".prologue-axis--light:not(.prologue-axis--contrast)");
+    const echo = document.querySelector(".manifesto-copy--echo");
+    if (!light || !echo) return;
+    const lightRect = light.getBoundingClientRect();
+    const echoRect = echo.getBoundingClientRect();
+    const top = Math.max(lightRect.top, echoRect.top);
+    const right = Math.min(lightRect.right, echoRect.right);
+    const bottom = Math.min(lightRect.bottom, echoRect.bottom);
+    const left = Math.max(lightRect.left, echoRect.left);
+    if (right <= left || bottom <= top || echoRect.width === 0 || echoRect.height === 0) {
+      echo.style.clipPath = "inset(100% 100% 100% 100%)";
+      return;
+    }
+    const insetTop = top - echoRect.top;
+    const insetRight = echoRect.right - right;
+    const insetBottom = echoRect.bottom - bottom;
+    const insetLeft = left - echoRect.left;
+    echo.style.clipPath = `inset(${insetTop}px ${insetRight}px ${insetBottom}px ${insetLeft}px)`;
+  }
+
+  if (document.querySelector(".manifesto-copy--echo")) {
+    updatePrologueManifestoMask();
+    window.addEventListener("resize", updatePrologueManifestoMask, { passive: true });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(updatePrologueManifestoMask);
+    }
+  }
+
   const proximityWord = document.querySelector("[data-proximity-word]");
   if (proximityWord && !reducedMotion.matches && !coarsePointer.matches) {
     const letters = Array.from(proximityWord.children);
