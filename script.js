@@ -921,25 +921,74 @@
   // same way the axis words do wherever they cross the photo. Both
   // elements' geometry depends on clamp()/vw/vh sizing, so this has to be
   // measured and reclipped on load/resize rather than hand-tuned once.
+  //
+  // Traces a clip-path around the union of a handful of vertically
+  // stacked, left-to-right-contiguous rectangles (one per paragraph
+  // line) — a plain rect for one, a "staircase" outline for more, since
+  // clip-path can't express several disjoint boxes directly.
+  function stairPolygon(rects) {
+    const last = rects.length - 1;
+    const pts = [[rects[0].right, rects[0].top]];
+    for (let i = 0; i <= last; i++) {
+      pts.push([rects[i].right, rects[i].bottom]);
+      if (i < last && rects[i + 1].right !== rects[i].right) {
+        pts.push([rects[i + 1].right, rects[i].bottom]);
+      }
+    }
+    pts.push([rects[last].left, rects[last].bottom]);
+    for (let i = last; i >= 0; i--) {
+      pts.push([rects[i].left, rects[i].top]);
+      if (i > 0 && rects[i - 1].left !== rects[i].left) {
+        pts.push([rects[i - 1].left, rects[i].top]);
+      }
+    }
+    return `polygon(${pts.map(([x, y]) => `${x}px ${y}px`).join(", ")})`;
+  }
+
   function updatePrologueManifestoMask() {
     const light = document.querySelector(".prologue-axis--light:not(.prologue-axis--contrast)");
     const echo = document.querySelector(".manifesto-copy--echo");
     if (!light || !echo) return;
-    const lightRect = light.getBoundingClientRect();
     const echoRect = echo.getBoundingClientRect();
-    const top = Math.max(lightRect.top, echoRect.top);
-    const right = Math.min(lightRect.right, echoRect.right);
-    const bottom = Math.min(lightRect.bottom, echoRect.bottom);
-    const left = Math.max(lightRect.left, echoRect.left);
-    if (right <= left || bottom <= top || echoRect.width === 0 || echoRect.height === 0) {
+    if (echoRect.width === 0 || echoRect.height === 0) {
       echo.style.clipPath = "inset(100% 100% 100% 100%)";
       return;
     }
-    const insetTop = top - echoRect.top;
-    const insetRight = echoRect.right - right;
-    const insetBottom = echoRect.bottom - bottom;
-    const insetLeft = left - echoRect.left;
-    echo.style.clipPath = `inset(${insetTop}px ${insetRight}px ${insetBottom}px ${insetLeft}px)`;
+
+    const lightRect = light.getBoundingClientRect();
+    // "lumière" is italic with tight negative letter-spacing, so its
+    // axis-aligned box is noticeably taller than its ink and, being
+    // slanted, mostly empty in its top-left corner (that's where the
+    // ascenders' top ends up, well right of the box's left edge).
+    // Trimming the top ~1/5 keeps the test from firing on paragraph text
+    // that sits under that empty corner rather than under a real stroke.
+    const inkTop = lightRect.top + lightRect.height * 0.2;
+
+    // .manifesto-copy--echo is one <p> spanning the paragraph's full
+    // (widest-line) column width, so testing against its own
+    // getBoundingClientRect() would let a short line "borrow" reveal
+    // width from a longer neighbour. Range.getClientRects() instead
+    // gives one rect per actually-rendered line, sized to that line's
+    // real text.
+    const range = document.createRange();
+    range.selectNodeContents(echo);
+    const hits = Array.from(range.getClientRects())
+      .map((r) => ({
+        top: Math.max(r.top, inkTop) - echoRect.top,
+        bottom: Math.min(r.bottom, lightRect.bottom) - echoRect.top,
+        left: Math.max(r.left, lightRect.left) - echoRect.left,
+        right: Math.min(r.right, lightRect.right) - echoRect.left,
+      }))
+      .filter((r) => r.right > r.left && r.bottom > r.top);
+
+    if (!hits.length) {
+      echo.style.clipPath = "inset(100% 100% 100% 100%)";
+    } else if (hits.length === 1) {
+      const r = hits[0];
+      echo.style.clipPath = `inset(${r.top}px ${echoRect.width - r.right}px ${echoRect.height - r.bottom}px ${r.left}px)`;
+    } else {
+      echo.style.clipPath = stairPolygon(hits);
+    }
   }
 
   if (document.querySelector(".manifesto-copy--echo")) {
